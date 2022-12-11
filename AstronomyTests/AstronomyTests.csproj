@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>AstroMultimedia.Astronomy.Tests</RootNamespace>
+        <Company>Astro Multimedia</Company>
+        <AssemblyName>AstroMultimedia.Astronomy.Tests</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+        <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
+        <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+        <PackageReference Include="coverlet.collector" Version="3.2.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="GeoCoordinate.NetCore" Version="1.0.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Algorithms\Algorithms.csproj" />
+        <ProjectReference Include="..\Repository\Repository.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="AstroMultimedia.Core.Time">
+        <HintPath>..\..\Core\Time\bin\Debug\net7.0\AstroMultimedia.Core.Time.dll</HintPath>
+      </Reference>
+      <Reference Include="AstroMultimedia.Core.Testing">
+        <HintPath>..\..\Core\Testing\bin\Debug\net7.0\AstroMultimedia.Core.Testing.dll</HintPath>
+      </Reference>
+      <Reference Include="AstroMultimedia.Numerics.Geometry">
+        <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\AstroMultimedia.Numerics.Geometry.dll</HintPath>
+      </Reference>
+      <Reference Include="AstroMultimedia.Quantities">
+        <HintPath>..\..\Quantities\Quantities\bin\Debug\net7.0\AstroMultimedia.Quantities.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>
