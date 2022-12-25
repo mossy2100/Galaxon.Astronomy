@@ -1,8 +1,8 @@
-﻿using AstroMultimedia.Core.Exceptions;
-using AstroMultimedia.Core.Strings;
+﻿using Galaxon.Core.Exceptions;
+using Galaxon.Core.Strings;
 using Microsoft.EntityFrameworkCore;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 // Main class for astronomical objects.
 // All physical quantities are in SI units.

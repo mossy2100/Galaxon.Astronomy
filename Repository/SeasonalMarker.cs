@@ -1,7 +1,7 @@
-﻿using AstroMultimedia.Core.Time;
-using AstroMultimedia.Numerics.Maths;
+﻿using Galaxon.Core.Time;
+using Galaxon.Numerics.Maths;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 public enum ESeasonalMarker
 {

@@ -1,7 +1,7 @@
-using AstroMultimedia.Numerics.Geometry;
-using AstroMultimedia.Quantities;
+using Galaxon.Numerics.Geometry;
+using Galaxon.Quantities;
 
-namespace AstroMultimedia.Astronomy.Tests;
+namespace Galaxon.Astronomy.Tests;
 
 [TestClass]
 public class TestSolar

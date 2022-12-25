@@ -4,8 +4,8 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AssemblyName>AstroMultimedia.Astronomy.Algorithms</AssemblyName>
-        <RootNamespace>AstroMultimedia.Astronomy.Algorithms</RootNamespace>
+        <AssemblyName>Galaxon.Astronomy.Algorithms</AssemblyName>
+        <RootNamespace>Galaxon.Astronomy.Algorithms</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,23 +13,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="AstroMultimedia.Core.Exceptions">
-        <HintPath>..\..\Core\Exceptions\bin\Debug\net7.0\AstroMultimedia.Core.Exceptions.dll</HintPath>
+      <Reference Include="Galaxon.Core.Exceptions">
+        <HintPath>..\..\Core\Exceptions\bin\Debug\net7.0\Galaxon.Core.Exceptions.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Core.Numbers">
-        <HintPath>..\..\Core\Numbers\bin\Debug\net7.0\AstroMultimedia.Core.Numbers.dll</HintPath>
+      <Reference Include="Galaxon.Core.Numbers">
+        <HintPath>..\..\Core\Numbers\bin\Debug\net7.0\Galaxon.Core.Numbers.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Core.Time">
-        <HintPath>..\..\Core\Time\bin\Debug\net7.0\AstroMultimedia.Core.Time.dll</HintPath>
+      <Reference Include="Galaxon.Core.Time">
+        <HintPath>..\..\Core\Time\bin\Debug\net7.0\Galaxon.Core.Time.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Numerics.Geometry">
-        <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\AstroMultimedia.Numerics.Geometry.dll</HintPath>
+      <Reference Include="Galaxon.Numerics.Geometry">
+        <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\Galaxon.Numerics.Geometry.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Numerics.Maths">
-        <HintPath>..\..\Numerics\Maths\bin\Debug\net7.0\AstroMultimedia.Numerics.Maths.dll</HintPath>
+      <Reference Include="Galaxon.Numerics.Maths">
+        <HintPath>..\..\Numerics\Maths\bin\Debug\net7.0\Galaxon.Numerics.Maths.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Quantities">
-        <HintPath>..\..\Quantities\Quantities\bin\Debug\net7.0\AstroMultimedia.Quantities.dll</HintPath>
+      <Reference Include="Galaxon.Quantities">
+        <HintPath>..\..\Quantities\Quantities\bin\Debug\net7.0\Galaxon.Quantities.dll</HintPath>
       </Reference>
     </ItemGroup>
 

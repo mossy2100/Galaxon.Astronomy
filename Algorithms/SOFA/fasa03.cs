@@ -1,4 +1,4 @@
-namespace AstroMultimedia.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms;
 
 public static partial class SOFA
 {

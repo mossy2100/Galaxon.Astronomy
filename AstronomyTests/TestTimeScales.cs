@@ -1,4 +1,4 @@
-﻿namespace AstroMultimedia.Astronomy.Tests;
+﻿namespace Galaxon.Astronomy.Tests;
 
 [TestClass]
 public class TestTimeScales

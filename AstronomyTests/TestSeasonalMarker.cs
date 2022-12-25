@@ -1,7 +1,7 @@
-﻿using AstroMultimedia.Core.Testing;
-using AstroMultimedia.Quantities;
+﻿using Galaxon.Core.Testing;
+using Galaxon.Quantities;
 
-namespace AstroMultimedia.Astronomy.Tests;
+namespace Galaxon.Astronomy.Tests;
 
 [TestClass]
 public class TestSeasonalMarker

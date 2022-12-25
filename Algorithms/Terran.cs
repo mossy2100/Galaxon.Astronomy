@@ -1,13 +1,13 @@
 ﻿using System.Data;
 using System.Globalization;
-using AstroMultimedia.Astronomy.Repository;
-using AstroMultimedia.Core.Exceptions;
-using AstroMultimedia.Core.Numbers;
-using AstroMultimedia.Core.Time;
-using AstroMultimedia.Numerics.Geometry;
-using AstroMultimedia.Numerics.Maths;
+using Galaxon.Astronomy.Repository;
+using Galaxon.Core.Exceptions;
+using Galaxon.Core.Numbers;
+using Galaxon.Core.Time;
+using Galaxon.Numerics.Geometry;
+using Galaxon.Numerics.Maths;
 
-namespace AstroMultimedia.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms;
 
 /// <summary>
 /// This is a static class containing useful methods and constants relating to

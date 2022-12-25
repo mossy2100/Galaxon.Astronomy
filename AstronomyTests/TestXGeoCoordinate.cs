@@ -1,7 +1,7 @@
-﻿using AstroMultimedia.Numerics.Geometry;
+﻿using Galaxon.Numerics.Geometry;
 using GeoCoordinatePortable;
 
-namespace AstroMultimedia.Astronomy.Tests;
+namespace Galaxon.Astronomy.Tests;
 
 [TestClass]
 public class TestCoordinates

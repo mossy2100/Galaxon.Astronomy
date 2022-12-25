@@ -1,6 +1,6 @@
-﻿using AstroMultimedia.Core.Time;
+﻿using Galaxon.Core.Time;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 public class LeapSecond
 {

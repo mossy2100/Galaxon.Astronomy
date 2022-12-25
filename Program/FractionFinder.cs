@@ -1,6 +1,6 @@
-﻿using AstroMultimedia.Core.Time;
+﻿using Galaxon.Core.Time;
 
-namespace AstroMultimedia.Astronomy;
+namespace Galaxon.Astronomy;
 
 public class FractionFinder
 {

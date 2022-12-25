@@ -1,6 +1,6 @@
-﻿using AstroMultimedia.Core.Numbers;
+﻿using Galaxon.Core.Numbers;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 public class VSOP87DRecord
 {

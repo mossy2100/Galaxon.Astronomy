@@ -1,6 +1,6 @@
-using AstroMultimedia.Core.Time;
+using Galaxon.Core.Time;
 
-namespace AstroMultimedia.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms;
 
 public static partial class SOFA
 {

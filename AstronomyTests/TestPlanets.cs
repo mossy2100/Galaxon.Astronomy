@@ -1,8 +1,8 @@
-﻿using AstroMultimedia.Core.Time;
-using AstroMultimedia.Numerics.Geometry;
-using AstroMultimedia.Quantities;
+﻿using Galaxon.Core.Time;
+using Galaxon.Numerics.Geometry;
+using Galaxon.Quantities;
 
-namespace AstroMultimedia.Astronomy.Tests;
+namespace Galaxon.Astronomy.Tests;
 
 [TestClass]
 public class TestPlanets

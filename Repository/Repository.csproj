@@ -4,9 +4,9 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>AstroMultimedia.Astronomy.Repository</RootNamespace>
+        <RootNamespace>Galaxon.Astronomy.Repository</RootNamespace>
         <Company>Astro Multimedia</Company>
-        <AssemblyName>AstroMultimedia.Astronomy.Repository</AssemblyName>
+        <AssemblyName>Galaxon.Astronomy.Repository</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -42,14 +42,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="AstroMultimedia.Numerics.Geometry">
-        <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\AstroMultimedia.Numerics.Geometry.dll</HintPath>
+      <Reference Include="Galaxon.Numerics.Geometry">
+        <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\Galaxon.Numerics.Geometry.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Numerics.Maths">
-        <HintPath>..\..\Numerics\Maths\bin\Debug\net7.0\AstroMultimedia.Numerics.Maths.dll</HintPath>
+      <Reference Include="Galaxon.Numerics.Maths">
+        <HintPath>..\..\Numerics\Maths\bin\Debug\net7.0\Galaxon.Numerics.Maths.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Quantities">
-        <HintPath>..\..\Quantities\Quantities\bin\Debug\net7.0\AstroMultimedia.Quantities.dll</HintPath>
+      <Reference Include="Galaxon.Quantities">
+        <HintPath>..\..\Quantities\Quantities\bin\Debug\net7.0\Galaxon.Quantities.dll</HintPath>
       </Reference>
     </ItemGroup>
 

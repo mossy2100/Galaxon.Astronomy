@@ -1,4 +1,4 @@
-﻿namespace AstroMultimedia.Astronomy.Repository;
+﻿namespace Galaxon.Astronomy.Repository;
 
 public class Molecule
 {

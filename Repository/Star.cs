@@ -1,9 +1,9 @@
 ﻿using System.Data;
-using AstroMultimedia.Core.Numbers;
-using AstroMultimedia.Core.Time;
-using AstroMultimedia.Numerics.Geometry;
+using Galaxon.Core.Numbers;
+using Galaxon.Core.Time;
+using Galaxon.Numerics.Geometry;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 public class Star : AstroObject
 {

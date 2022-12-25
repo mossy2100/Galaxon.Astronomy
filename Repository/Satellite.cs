@@ -1,6 +1,6 @@
-﻿using AstroMultimedia.Core.Strings;
+﻿using Galaxon.Core.Strings;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 public class Satellite : AstroObject
 {

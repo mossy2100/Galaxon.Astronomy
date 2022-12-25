@@ -1,6 +1,6 @@
-using AstroMultimedia.Numerics.Geometry;
+using Galaxon.Numerics.Geometry;
 
-namespace AstroMultimedia.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms;
 
 public static partial class SOFA
 {

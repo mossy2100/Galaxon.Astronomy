@@ -1,7 +1,7 @@
-﻿using AstroMultimedia.Astronomy.Repository;
-using AstroMultimedia.Core.Exceptions;
+﻿using Galaxon.Astronomy.Repository;
+using Galaxon.Core.Exceptions;
 
-namespace AstroMultimedia.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms;
 
 /// <summary>
 /// A container for constants and static methods related to Mars.

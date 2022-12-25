@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
-using AstroMultimedia.Core.Strings;
-using AstroMultimedia.Core.Time;
+using Galaxon.Core.Strings;
+using Galaxon.Core.Time;
 using CsvHelper;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 public class Planet : AstroObject
 {

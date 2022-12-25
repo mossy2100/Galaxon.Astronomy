@@ -1,6 +1,6 @@
-﻿using AstroMultimedia.Core.Exceptions;
+﻿using Galaxon.Core.Exceptions;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 public class Atmosphere
 {

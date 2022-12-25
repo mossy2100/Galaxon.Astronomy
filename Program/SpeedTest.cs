@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace AstroMultimedia.Astronomy;
+namespace Galaxon.Astronomy;
 
 public delegate double ToJulianDay(DateTime dt);
 

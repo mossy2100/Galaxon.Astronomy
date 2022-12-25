@@ -5,9 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <RootNamespace>AstroMultimedia.Astronomy.Tests</RootNamespace>
+        <RootNamespace>Galaxon.Astronomy.Tests</RootNamespace>
         <Company>Astro Multimedia</Company>
-        <AssemblyName>AstroMultimedia.Astronomy.Tests</AssemblyName>
+        <AssemblyName>Galaxon.Astronomy.Tests</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,17 +27,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="AstroMultimedia.Core.Time">
-        <HintPath>..\..\Core\Time\bin\Debug\net7.0\AstroMultimedia.Core.Time.dll</HintPath>
+      <Reference Include="Galaxon.Core.Time">
+        <HintPath>..\..\Core\Time\bin\Debug\net7.0\Galaxon.Core.Time.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Core.Testing">
-        <HintPath>..\..\Core\Testing\bin\Debug\net7.0\AstroMultimedia.Core.Testing.dll</HintPath>
+      <Reference Include="Galaxon.Core.Testing">
+        <HintPath>..\..\Core\Testing\bin\Debug\net7.0\Galaxon.Core.Testing.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Numerics.Geometry">
-        <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\AstroMultimedia.Numerics.Geometry.dll</HintPath>
+      <Reference Include="Galaxon.Numerics.Geometry">
+        <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\Galaxon.Numerics.Geometry.dll</HintPath>
       </Reference>
-      <Reference Include="AstroMultimedia.Quantities">
-        <HintPath>..\..\Quantities\Quantities\bin\Debug\net7.0\AstroMultimedia.Quantities.dll</HintPath>
+      <Reference Include="Galaxon.Quantities">
+        <HintPath>..\..\Quantities\Quantities\bin\Debug\net7.0\Galaxon.Quantities.dll</HintPath>
       </Reference>
     </ItemGroup>
 

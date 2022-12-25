@@ -1,8 +1,8 @@
-﻿using AstroMultimedia.Core.Numbers;
-using AstroMultimedia.Numerics.Geometry;
+﻿using Galaxon.Core.Numbers;
+using Galaxon.Numerics.Geometry;
 using GeoCoordinatePortable;
 
-namespace AstroMultimedia.Astronomy.Repository;
+namespace Galaxon.Astronomy.Repository;
 
 public class Physical
 {

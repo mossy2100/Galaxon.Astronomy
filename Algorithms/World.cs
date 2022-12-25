@@ -1,11 +1,11 @@
-using AstroMultimedia.Astronomy.Repository;
-using AstroMultimedia.Core.Exceptions;
-using AstroMultimedia.Numerics.Geometry;
-using AstroMultimedia.Numerics.Maths;
-using AstroMultimedia.Quantities;
+using Galaxon.Astronomy.Repository;
+using Galaxon.Core.Exceptions;
+using Galaxon.Numerics.Geometry;
+using Galaxon.Numerics.Maths;
+using Galaxon.Quantities;
 using GeoCoordinatePortable;
 
-namespace AstroMultimedia.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms;
 
 public class World
 {

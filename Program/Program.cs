@@ -1,4 +1,4 @@
-﻿namespace AstroMultimedia.Astronomy;
+﻿namespace Galaxon.Astronomy;
 
 public class Program
 {
