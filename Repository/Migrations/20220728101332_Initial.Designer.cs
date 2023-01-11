@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Astronomy.Migrations
+namespace Galaxon.Astronomy.Repository.Migrations
 {
     [DbContext(typeof(AstroDbContext))]
     [Migration("20220728101332_Initial")]

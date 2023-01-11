@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Astronomy.Migrations
+namespace Galaxon.Astronomy.Repository.Migrations
 {
     public partial class Initial : Migration
     {

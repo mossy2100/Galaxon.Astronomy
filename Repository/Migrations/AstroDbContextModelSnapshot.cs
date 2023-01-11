@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Astronomy.Migrations
+namespace Galaxon.Astronomy.Repository.Migrations
 {
     [DbContext(typeof(AstroDbContext))]
     partial class AstroDbContextModelSnapshot : ModelSnapshot
