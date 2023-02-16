@@ -27,11 +27,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Galaxon.Core.Time">
-        <HintPath>..\..\Core\Time\bin\Debug\net7.0\Galaxon.Core.Time.dll</HintPath>
-      </Reference>
-      <Reference Include="Galaxon.Core.Testing">
-        <HintPath>..\..\Core\Testing\bin\Debug\net7.0\Galaxon.Core.Testing.dll</HintPath>
+      <Reference Include="Galaxon.Core">
+        <HintPath>..\..\Core\Core\bin\Debug\net7.0\Galaxon.Core.dll</HintPath>
       </Reference>
       <Reference Include="Galaxon.Numerics.Geometry">
         <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\Galaxon.Numerics.Geometry.dll</HintPath>

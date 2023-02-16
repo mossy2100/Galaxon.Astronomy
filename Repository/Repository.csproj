@@ -29,19 +29,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Core\Exceptions\Exceptions.csproj" />
-        <ProjectReference Include="..\..\Core\Numbers\Numbers.csproj" />
-        <ProjectReference Include="..\..\Core\Time\Time.csproj" />
-        <ProjectReference Include="..\..\Core\Strings\Strings.csproj" />
-        <ProjectReference Include="..\..\Core\Collections\Collections.csproj" />
-        <ProjectReference Include="..\..\Quantities\Quantities\Quantities.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Folder Include="Migrations\" />
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="Galaxon.Core">
+        <HintPath>..\..\Core\Core\bin\Debug\net7.0\Galaxon.Core.dll</HintPath>
+      </Reference>
       <Reference Include="Galaxon.Numerics.Geometry">
         <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\Galaxon.Numerics.Geometry.dll</HintPath>
       </Reference>
