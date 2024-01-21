@@ -7,6 +7,7 @@ public class Stellar
 
     // Link to owner.
     public int AstroObjectId { get; set; }
+
     public AstroObject? AstroObject { get; set; }
 
     // Spectral classification.

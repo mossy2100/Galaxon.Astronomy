@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AssemblyName>Galaxon.Astronomy.Algorithms</AssemblyName>
@@ -14,16 +14,16 @@
 
     <ItemGroup>
       <Reference Include="Galaxon.Core">
-        <HintPath>..\..\Core\Core\bin\Debug\net7.0\Galaxon.Core.dll</HintPath>
+        <HintPath>..\..\Core\Core\bin\Debug\net8.0\Galaxon.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="Galaxon.Numerics.Algebra">
+        <HintPath>..\..\Numerics\Algebra\bin\Debug\net8.0\Galaxon.Numerics.Algebra.dll</HintPath>
       </Reference>
       <Reference Include="Galaxon.Numerics.Geometry">
-        <HintPath>..\..\Numerics\Geometry\bin\Debug\net7.0\Galaxon.Numerics.Geometry.dll</HintPath>
-      </Reference>
-      <Reference Include="Galaxon.Numerics.Maths">
-        <HintPath>..\..\Numerics\Maths\bin\Debug\net7.0\Galaxon.Numerics.Maths.dll</HintPath>
+        <HintPath>..\..\Numerics\Geometry\bin\Debug\net8.0\Galaxon.Numerics.Geometry.dll</HintPath>
       </Reference>
       <Reference Include="Galaxon.Quantities">
-        <HintPath>..\..\Quantities\Quantities\bin\Debug\net7.0\Galaxon.Quantities.dll</HintPath>
+        <HintPath>..\..\Quantities\Quantities\bin\Debug\net8.0\Galaxon.Quantities.dll</HintPath>
       </Reference>
     </ItemGroup>
 

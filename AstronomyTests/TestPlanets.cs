@@ -14,7 +14,7 @@ public class TestPlanets
     [TestMethod]
     public void TestERA()
     {
-        DateTime dt = new(2017, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        DateTime dt = new (2017, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         double expected = Angle.DmsToRad(100, 37, 12.4365);
         double actual = Terran.CalcERA(dt);
         double delta = Angle.DmsToRad(0, 0, 1e-3);
@@ -28,8 +28,8 @@ public class TestPlanets
     public void TestCalcPositionVenus()
     {
         // Arrange.
-        using AstroDbContext db = new();
-        Planet? venus = Planet.Load(db, "Venus");
+        using AstroDbContext db = new ();
+        var venus = Planet.Load(db, "Venus");
         if (venus == null)
         {
             Assert.Fail("Could not find Venus in the database.");
@@ -38,10 +38,11 @@ public class TestPlanets
 
         double expectedL = Angle.NormalizeRadians(-68.659_258_2);
         double expectedB = Angle.NormalizeRadians(-0.045_739_9);
-        double expectedR = 0.724_603;
+        var expectedR = 0.724_603;
 
         // Act.
-        (double actualL, double actualB, double actualR) = World.CalcPlanetPosition(venus, 2_448_976.5);
+        (double actualL, double actualB, double actualR) =
+            World.CalcPlanetPosition(venus, 2_448_976.5);
 
         // Assert.
         // I assume larger delta values are needed here because Meeus uses a
@@ -59,14 +60,14 @@ public class TestPlanets
     public void TestCalcPositionSaturn()
     {
         // Arrange.
-        using AstroDbContext db = new();
-        Planet? saturn = Planet.Load(db, "Saturn");
+        using AstroDbContext db = new ();
+        var saturn = Planet.Load(db, "Saturn");
         if (saturn == null)
         {
             Assert.Fail("Could not find Saturn in the database.");
             return;
         }
-        DateTime dttt = new DateTime(1999, 7, 26, 0, 0, 0, DateTimeKind.Utc);
+        var dttt = new DateTime(1999, 7, 26, 0, 0, 0, DateTimeKind.Utc);
         double jdtt = dttt.ToJulianDay();
 
         // Act.

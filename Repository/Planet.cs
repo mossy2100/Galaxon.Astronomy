@@ -1,48 +1,16 @@
 ﻿using System.Globalization;
+using CsvHelper;
 using Galaxon.Core.Strings;
 using Galaxon.Core.Time;
-using CsvHelper;
 
 namespace Galaxon.Astronomy.Repository;
 
 public class Planet : AstroObject
 {
-    #region Static Properties
-
-    /// <summary>
-    /// I'll hard code this for now. If we find any new planets (or Pluto
-    /// gets reclassified again), we can update it.
-    /// </summary>
-    public const byte Count = 8;
-
-    /// <summary>
-    /// Get all the planets. There are only 8, so this is a useful and
-    /// efficient cache.
-    /// </summary>
-    private static List<Planet> s_all = new();
-
-    public static List<Planet> All
-    {
-        get
-        {
-            // If we didn't load them yet, do it now.
-            if (s_all.Count == 0)
-            {
-                using AstroDbContext db = new();
-                s_all = db.Planets.ToList();
-            }
-            return s_all;
-        }
-    }
-
-    #endregion Static Properties
-
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public Planet()
-    {
-    }
+    public Planet() { }
 
     /// <summary>
     /// Get the planet name given a number.
@@ -51,8 +19,9 @@ public class Planet : AstroObject
     /// <returns>The planet name.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If the number is not in
     /// the range 1..8.</exception>
-    public static string NumberToName(byte num) =>
-        num switch
+    public static string NumberToName(byte num)
+    {
+        return num switch
         {
             1 => "Mercury",
             2 => "Venus",
@@ -65,6 +34,7 @@ public class Planet : AstroObject
             _ => throw new ArgumentOutOfRangeException(
                 $"Planet number must be in the range 1..{Count}.")
         };
+    }
 
     /// <summary>
     /// Load a planet from the database by name.
@@ -72,8 +42,10 @@ public class Planet : AstroObject
     /// <param name="db"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static Planet? Load(AstroDbContext db, string name) =>
-        AstroObject.Load(db.Planets, name);
+    public static Planet? Load(AstroDbContext db, string name)
+    {
+        return Load(db.Planets, name);
+    }
 
     /// <summary>
     /// Load a planet from the database by number.
@@ -81,23 +53,25 @@ public class Planet : AstroObject
     /// <param name="db"></param>
     /// <param name="num"></param>
     /// <returns></returns>
-    public static Planet? Load(AstroDbContext db, uint num) =>
-        AstroObject.Load(db.Planets, num);
+    public static Planet? Load(AstroDbContext db, uint num)
+    {
+        return Load(db.Planets, num);
+    }
 
     /// <summary>
     /// Initialize the planet data from the CSV file.
     /// </summary>
     public static void InitializeData()
     {
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
 
         // Get the Sun.
-        Star? sun = Star.Load(db, "Sun");
+        var sun = Star.Load(db, "Sun");
 
         // Open the CSV file for parsing.
-        string csvPath = $"{AstroDbContext.DataDirectory()}/Planets/Planets.csv";
-        using StreamReader stream = new(csvPath);
-        using CsvReader csv = new(stream, CultureInfo.InvariantCulture);
+        var csvPath = $"{AstroDbContext.DataDirectory()}/Planets/Planets.csv";
+        using StreamReader stream = new (csvPath);
+        using CsvReader csv = new (stream, CultureInfo.InvariantCulture);
         // Skip the header row.
         csv.Read();
         csv.ReadHeader();
@@ -156,11 +130,11 @@ public class Planet : AstroObject
 
             // Apoapsis is provided in km, convert to m.
             const double kilo = 1000;
-            double? apoapsis = csv.GetField(3).ToDouble();
+            var apoapsis = csv.GetField(3).ToDouble();
             planet.Orbit.Apoapsis = Quantity.ConvertAmount(apoapsis, "km", "m");
 
             // Periapsis is provided in km, convert to m.
-            double? periapsis = csv.GetField(4).ToDouble();
+            var periapsis = csv.GetField(4).ToDouble();
             planet.Orbit.Periapsis = Quantity.ConvertAmount(periapsis, "km", "m");
 
             // Semi-major axis is provided in km, convert to m.
@@ -168,11 +142,12 @@ public class Planet : AstroObject
             planet.Orbit.Eccentricity = csv.GetField(6).ToDouble();
 
             // Sidereal orbit period is provided in days, convert to seconds.
-            planet.Orbit.SiderealOrbitPeriod = csv.GetField(7).ToDouble() * XTimeSpan.SecondsPerDay;
+            planet.Orbit.SiderealOrbitPeriod =
+                csv.GetField(7).ToDouble() * XTimeSpan.SECONDS_PER_DAY;
 
             // Synodic orbit period is provided in days, convert to seconds.
-            double? synodicPeriod = csv.GetField(8).ToDouble();
-            planet.Orbit.SynodicOrbitPeriod = synodicPeriod * XTimeSpan.SecondsPerDay;
+            var synodicPeriod = csv.GetField(8).ToDouble();
+            planet.Orbit.SynodicOrbitPeriod = synodicPeriod * XTimeSpan.SECONDS_PER_DAY;
 
             // Avg orbital speed is provided in km/s, convert to m/s.
             planet.Orbit.AvgOrbitSpeed = csv.GetField(9).ToDouble() * kilo;
@@ -223,9 +198,9 @@ public class Planet : AstroObject
             // Rotational parameters.
             planet.Rotation ??= new Rotation();
             planet.Rotation.SynodicRotationPeriod =
-                csv.GetField(30).ToDouble() * XTimeSpan.SecondsPerDay;
+                csv.GetField(30).ToDouble() * XTimeSpan.SECONDS_PER_DAY;
             planet.Rotation.SiderealRotationPeriod =
-                csv.GetField(31).ToDouble() * XTimeSpan.SecondsPerDay;
+                csv.GetField(31).ToDouble() * XTimeSpan.SECONDS_PER_DAY;
             planet.Rotation.EquatRotationVelocity = csv.GetField(32).ToDouble();
             planet.Rotation.Obliquity = csv.GetField(33).ToDouble() * Angle.RadiansPerDegree;
             planet.Rotation.NorthPoleRightAscension =
@@ -242,4 +217,34 @@ public class Planet : AstroObject
             db.SaveChanges();
         }
     }
+
+    #region Static Properties
+
+    /// <summary>
+    /// I'll hard code this for now. If we find any new planets (or Pluto
+    /// gets reclassified again), we can update it.
+    /// </summary>
+    public const byte Count = 8;
+
+    /// <summary>
+    /// Get all the planets. There are only 8, so this is a useful and
+    /// efficient cache.
+    /// </summary>
+    private static List<Planet> s_all = new ();
+
+    public static List<Planet> All
+    {
+        get
+        {
+            // If we didn't load them yet, do it now.
+            if (s_all.Count == 0)
+            {
+                using AstroDbContext db = new ();
+                s_all = db.Planets.ToList();
+            }
+            return s_all;
+        }
+    }
+
+    #endregion Static Properties
 }

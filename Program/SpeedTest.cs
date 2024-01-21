@@ -9,10 +9,10 @@ public class SpeedTest
     protected static List<double> DateTimeToJulianDayMethod(string methodName,
         ToJulianDay tjd, List<DateTime> dateTimes)
     {
-        Stopwatch sw = new();
+        Stopwatch sw = new ();
 
         sw.Start();
-        List<double> results = dateTimes.Select(tjd.Invoke).ToList();
+        var results = dateTimes.Select(tjd.Invoke).ToList();
         sw.Stop();
 
         Console.WriteLine(

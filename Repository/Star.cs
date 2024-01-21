@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
-using Galaxon.Numerics.Geometry;
 
 namespace Galaxon.Astronomy.Repository;
 
@@ -26,7 +25,10 @@ public class Star : AstroObject
     //        .Include(star => star.Stellar)
     //        .FirstOrDefault(star => star.Name == searchString);
     //}
-    public static Star? Load(AstroDbContext db, string name) => AstroObject.Load(db.Stars, name);
+    public static Star? Load(AstroDbContext db, string name)
+    {
+        return Load(db.Stars, name);
+    }
 
     /// <summary>
     /// Initialize the Stars data, which for now just means adding the Sun to
@@ -34,7 +36,7 @@ public class Star : AstroObject
     /// </summary>
     public static void InitializeData()
     {
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
         Star? sun = Load(db, "Sun");
         if (sun == null)
         {
@@ -113,7 +115,7 @@ public class Star : AstroObject
         // 29,000 light years in metres (rounded to 2 significant figures).
         sun.Orbit.SemiMajorAxis = XDouble.RoundSigFigs(29e3 * Length.MetresPerLightYear, 2);
         // 230 million years in seconds (rounded to 2 significant figures).
-        sun.Orbit.SiderealOrbitPeriod = XDouble.RoundSigFigs(230e6 * XTimeSpan.SecondsPerYear, 2);
+        sun.Orbit.SiderealOrbitPeriod = XDouble.RoundSigFigs(230e6 * XTimeSpan.SECONDS_PER_YEAR, 2);
         // Orbital speed in m/s.
         sun.Orbit.AvgOrbitSpeed = 251e3;
         db.SaveChanges();
@@ -126,7 +128,7 @@ public class Star : AstroObject
         sun.Rotation.NorthPoleRightAscension = Angle.DegToRad(286.13);
         sun.Rotation.NorthPoleDeclination = Angle.DegToRad(63.87);
         // Sidereal rotation period in seconds.
-        sun.Rotation.SiderealRotationPeriod = 25.05 * XTimeSpan.SecondsPerDay;
+        sun.Rotation.SiderealRotationPeriod = 25.05 * XTimeSpan.SECONDS_PER_DAY;
         // Equatorial rotation velocity in m/s.
         sun.Rotation.EquatRotationVelocity = 1997;
         db.SaveChanges();

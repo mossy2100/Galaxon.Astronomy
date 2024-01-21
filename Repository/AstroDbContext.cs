@@ -9,14 +9,23 @@ namespace Galaxon.Astronomy.Repository;
 public class AstroDbContext : DbContext
 {
     /// <summary>
+    /// Default constructor.
+    /// </summary>
+    public AstroDbContext() { }
+
+    /// <summary>
     /// AstroObjects types.
     /// </summary>
     public DbSet<AstroObject> AstroObjects => Set<AstroObject>();
 
     public DbSet<AstroObjectGroup> AstroObjectGroups => Set<AstroObjectGroup>();
+
     public DbSet<Star> Stars => Set<Star>();
+
     public DbSet<Planet> Planets => Set<Planet>();
+
     public DbSet<Planetoid> Planetoids => Set<Planetoid>();
+
     public DbSet<Satellite> Satellites => Set<Satellite>();
 
     /// <summary>
@@ -25,12 +34,19 @@ public class AstroDbContext : DbContext
     public DbSet<Physical> PhysicalParams => Set<Physical>();
 
     public DbSet<Rotation> RotationalParams => Set<Rotation>();
+
     public DbSet<Orbit> OrbitalParams => Set<Orbit>();
+
     public DbSet<Observation> ObservationalParams => Set<Observation>();
+
     public DbSet<Stellar> StellarParams => Set<Stellar>();
+
     public DbSet<Atmosphere> Atmospheres => Set<Atmosphere>();
+
     public DbSet<AtmoConstituent> AtmoConstituents => Set<AtmoConstituent>();
+
     public DbSet<Molecule> Molecules => Set<Molecule>();
+
     public DbSet<MinorPlanetRecord> MinorPlanetRecords => Set<MinorPlanetRecord>();
 
     /// <summary>
@@ -39,17 +55,14 @@ public class AstroDbContext : DbContext
     public DbSet<SeasonalMarker> SeasonalMarkers => Set<SeasonalMarker>();
 
     public DbSet<LunarPhase> LunarPhases => Set<LunarPhase>();
-    public DbSet<EasterDate> EasterDates => Set<EasterDate>();
-    public DbSet<DeltaTEntry> DeltaTEntries => Set<DeltaTEntry>();
-    public DbSet<VSOP87DRecord> VSOP87D => Set<VSOP87DRecord>();
-    public DbSet<LeapSecond> LeapSeconds => Set<LeapSecond>();
 
-    /// <summary>
-    /// Default constructor.
-    /// </summary>
-    public AstroDbContext()
-    {
-    }
+    public DbSet<EasterDate> EasterDates => Set<EasterDate>();
+
+    public DbSet<DeltaTEntry> DeltaTEntries => Set<DeltaTEntry>();
+
+    public DbSet<VSOP87DRecord> VSOP87D => Set<VSOP87DRecord>();
+
+    public DbSet<LeapSecond> LeapSeconds => Set<LeapSecond>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -118,6 +131,8 @@ public class AstroDbContext : DbContext
             .HaveConversion<DateTimeConverter>();
     }
 
-    public static string DataDirectory() =>
-        @"/Users/shaun/Documents/Web & software development/C#/Projects/Data";
+    public static string DataDirectory()
+    {
+        return @"/Users/shaun/Documents/Web & software development/C#/Projects/Data";
+    }
 }

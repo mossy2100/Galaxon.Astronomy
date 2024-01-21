@@ -2,23 +2,6 @@
 
 public class Molecule
 {
-    #region Properties
-
-    // Primary key.
-    public int Id { get; set; }
-
-    // Name.
-    public string Name { get; set; } = "";
-
-    // Chemical symbol.
-    public string Symbol { get; set; } = "";
-
-    #endregion Properties
-
-    public Molecule()
-    {
-    }
-
     /// <summary>
     /// Add a new molecule to the database if it doesn't already exist.
     /// </summary>
@@ -47,4 +30,17 @@ public class Molecule
         }
         db.SaveChanges();
     }
+
+    #region Properties
+
+    // Primary key.
+    public int Id { get; set; }
+
+    // Name.
+    public string Name { get; set; } = "";
+
+    // Chemical symbol.
+    public string Symbol { get; set; } = "";
+
+    #endregion Properties
 }

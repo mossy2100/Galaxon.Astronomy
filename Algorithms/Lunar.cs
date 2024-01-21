@@ -1,5 +1,3 @@
 namespace Galaxon.Astronomy.Algorithms;
 
-public static class Lunar
-{
-}
+public static class Lunar { }

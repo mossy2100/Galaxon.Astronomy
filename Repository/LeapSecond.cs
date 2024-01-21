@@ -4,6 +4,47 @@ namespace Galaxon.Astronomy.Repository;
 
 public class LeapSecond
 {
+    /// <summary>
+    /// Initialise the data table with the current dates that had leap seconds.
+    /// </summary>
+    public static void ParseData()
+    {
+        using AstroDbContext db = new ();
+
+        // Load the HTML table as a string.
+        var dataFilePath =
+            $"{AstroDbContext.DataDirectory()}/Leap seconds/Leap second and UT1-UTC information _ NIST.html";
+        string html = File.ReadAllText(dataFilePath);
+
+        // Get the dates.
+        Regex rxDate = new (@"(\d{4})-(\d{2})-(\d{2})");
+        MatchCollection matches = rxDate.Matches(html);
+        List<DateOnly> dates = new ();
+        foreach (Match match in matches)
+        {
+            var year = int.Parse(match.Groups[1].Value);
+            var month = int.Parse(match.Groups[2].Value);
+            var day = int.Parse(match.Groups[3].Value);
+            DateOnly date = new (year, month, day);
+            dates.Add(date);
+        }
+
+        // Sort, then add to database.
+        if (dates.Count > 0)
+        {
+            foreach (DateOnly dt in dates.OrderBy(d => d.GetTotalDays()))
+            {
+                LeapSecond? existingRecord = db.LeapSeconds.FirstOrDefault(ls => ls.Date == dt);
+                if (existingRecord == null)
+                {
+                    // Add a new record.
+                    db.LeapSeconds.Add(new LeapSecond { Date = dt });
+                    db.SaveChanges();
+                }
+            }
+        }
+    }
+
     #region Properties
 
     public int Id { get; set; }
@@ -24,7 +65,7 @@ public class LeapSecond
             if (_list == null)
             {
                 // Load the leap seconds from the database.
-                using AstroDbContext db = new();
+                using AstroDbContext db = new ();
                 _list = db.LeapSeconds.ToList();
             }
             return _list;
@@ -32,45 +73,4 @@ public class LeapSecond
     }
 
     #endregion Properties
-
-    /// <summary>
-    /// Initialise the data table with the current dates that had leap seconds.
-    /// </summary>
-    public static void ParseData()
-    {
-        using AstroDbContext db = new();
-
-        // Load the HTML table as a string.
-        string dataFilePath =
-            $"{AstroDbContext.DataDirectory()}/Leap seconds/Leap second and UT1-UTC information _ NIST.html";
-        string html = File.ReadAllText(dataFilePath);
-
-        // Get the dates.
-        Regex rxDate = new(@"(\d{4})-(\d{2})-(\d{2})");
-        MatchCollection matches = rxDate.Matches(html);
-        List<DateOnly> dates = new();
-        foreach (Match match in matches)
-        {
-            int year = int.Parse(match.Groups[1].Value);
-            int month = int.Parse(match.Groups[2].Value);
-            int day = int.Parse(match.Groups[3].Value);
-            DateOnly date = new(year, month, day);
-            dates.Add(date);
-        }
-
-        // Sort, then add to database.
-        if (dates.Count > 0)
-        {
-            foreach (DateOnly dt in dates.OrderBy(d => d.GetTotalDays()))
-            {
-                LeapSecond? existingRecord = db.LeapSeconds.FirstOrDefault(ls => ls.Date == dt);
-                if (existingRecord == null)
-                {
-                    // Add a new record.
-                    db.LeapSeconds.Add(new LeapSecond { Date = dt });
-                    db.SaveChanges();
-                }
-            }
-        }
-    }
 }

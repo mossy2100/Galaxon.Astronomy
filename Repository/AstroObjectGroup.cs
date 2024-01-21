@@ -2,35 +2,16 @@
 
 public class AstroObjectGroup
 {
-    #region Properties
-
-    // Primary key.
-    public int Id { get; set; }
-
-    // Group name.
-    public string Name { get; set; } = "";
-
-    // Objects in the group (navigation property).
-    public List<AstroObject> Objects { get; set; } = new();
-
-    // Parent group.
-    public int? ParentId { get; set; }
-    public AstroObjectGroup? Parent { get; set; }
-
-    #endregion Properties
-
-    public AstroObjectGroup()
-    {
-    }
-
     /// <summary>
     /// Load an AstroObjectGroup from the database.
     /// </summary>
     /// <param name="db"></param>
     /// <param name="searchString">The group name.</param>
     /// <returns>The found object or null.</returns>
-    public static AstroObjectGroup? Load(AstroDbContext db, string searchString) =>
-        db.AstroObjectGroups.FirstOrDefault(cat => cat.Name == searchString);
+    public static AstroObjectGroup? Load(AstroDbContext db, string searchString)
+    {
+        return db.AstroObjectGroups.FirstOrDefault(cat => cat.Name == searchString);
+    }
 
     /// <summary>
     /// Create or update a group.
@@ -69,7 +50,7 @@ public class AstroObjectGroup
     /// </summary>
     public static void InitializeData()
     {
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
 
         // Stars.
         AstroObjectGroup star = CreateOrUpdate(db, "Star");
@@ -145,4 +126,22 @@ public class AstroObjectGroup
         CreateOrUpdate(db, "Prograde satellite", satellite);
         CreateOrUpdate(db, "Retrograde satellite", satellite);
     }
+
+    #region Properties
+
+    // Primary key.
+    public int Id { get; set; }
+
+    // Group name.
+    public string Name { get; set; } = "";
+
+    // Objects in the group (navigation property).
+    public List<AstroObject> Objects { get; set; } = new ();
+
+    // Parent group.
+    public int? ParentId { get; set; }
+
+    public AstroObjectGroup? Parent { get; set; }
+
+    #endregion Properties
 }

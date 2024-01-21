@@ -3,35 +3,16 @@
 public enum ELunarPhase
 {
     NewMoon = 0,
+
     FirstQuarter = 1,
+
     FullMoon = 2,
+
     ThirdQuarter = 3
 }
 
 public class LunarPhase
 {
-    #region Properties
-
-    public int Id { get; set; }
-
-    /// <summary>
-    /// This value is:
-    ///   0 = new moon
-    ///   1 = first quarter
-    ///   2 = full moon
-    ///   3 = third quarter
-    /// </summary>
-    [Column(TypeName = "tinyint")]
-    public int PhaseNumber { get; set; }
-
-    /// <summary>
-    /// The UTC datetime of the lunar phase.
-    /// </summary>
-    [Column(TypeName = "datetime2")]
-    public DateTime UtcDateTime { get; set; }
-
-    #endregion Properties
-
     /// <summary>
     /// Extract the lunar phase data from the web pages captured from
     /// AstroPixels and copy the data into the database.
@@ -39,14 +20,14 @@ public class LunarPhase
     public static void ParseLunarPhaseData()
     {
         Regex rxDataLine =
-            new(@"(\d{4})?\s+(([a-z]{3})\s+(\d{1,2})\s+(\d{2}):(\d{2})\s+([a-z])?){1,4}",
+            new (@"(\d{4})?\s+(([a-z]{3})\s+(\d{1,2})\s+(\d{2}):(\d{2})\s+([a-z])?){1,4}",
                 RegexOptions.IgnoreCase);
         int? year = null;
         string? curYearStr = null;
 
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
 
-        for (int century = 0; century < 20; century++)
+        for (var century = 0; century < 20; century++)
         {
             int startYear = century * 100 + 1;
             int endYear = (century + 1) * 100;
@@ -77,9 +58,9 @@ public class LunarPhase
                 }
 
                 // Get the dates and times of the phases, if present.
-                for (int phase = 0; phase < 4; phase++)
+                for (var phase = 0; phase < 4; phase++)
                 {
-                    string dateStr = line.Substring(8 + (phase * 18), 13);
+                    string dateStr = line.Substring(8 + phase * 18, 13);
                     if (dateStr.Trim() == "")
                     {
                         continue;
@@ -106,4 +87,26 @@ public class LunarPhase
             }
         }
     }
+
+    #region Properties
+
+    public int Id { get; set; }
+
+    /// <summary>
+    /// This value is:
+    ///   0 = new moon
+    ///   1 = first quarter
+    ///   2 = full moon
+    ///   3 = third quarter
+    /// </summary>
+    [Column(TypeName = "tinyint")]
+    public int PhaseNumber { get; set; }
+
+    /// <summary>
+    /// The UTC datetime of the lunar phase.
+    /// </summary>
+    [Column(TypeName = "datetime2")]
+    public DateTime UtcDateTime { get; set; }
+
+    #endregion Properties
 }

@@ -1,5 +1,5 @@
-﻿using Galaxon.Core.Testing;
-using Galaxon.Quantities;
+﻿using Galaxon.Astronomy.Repository.Enums;
+using Galaxon.Core.Testing;
 
 namespace Galaxon.Astronomy.Tests;
 
@@ -11,9 +11,9 @@ public class TestSeasonalMarker
     {
         // Test Example 27.a from AA2 p180.
         DateTime dt = Terran.CalcSeasonalMarkerApprox(1962, ESeasonalMarker.JuneSolstice);
-        DateTime dt2 = new DateTime(1962, 6, 21, 21, 25, 8);
+        var dt2 = new DateTime(1962, 6, 21, 21, 25, 8);
         // Check they match within 1 second.
-        TimeSpan delta = new TimeSpan((long)TimeSpan.TicksPerSecond);
+        var delta = new TimeSpan(TimeSpan.TicksPerSecond);
         XAssert.AreEqual(dt, dt2, delta);
     }
 }

@@ -1,50 +1,17 @@
-﻿using Galaxon.Core.Time;
-using Galaxon.Numerics.Maths;
-
-namespace Galaxon.Astronomy.Repository;
-
-public enum ESeasonalMarker
-{
-    MarchEquinox = 0,
-    JuneSolstice = 1,
-    SeptemberEquinox = 2,
-    DecemberSolstice = 3
-}
+﻿namespace Galaxon.Astronomy.Repository;
 
 public class SeasonalMarker
 {
-    #region Properties
-
-    public int Id { get; set; }
-
-    /// <summary>
-    /// This value is:
-    ///   0 = March equinox
-    ///   1 = June solstice
-    ///   2 = September equinox
-    ///   3 = December solstice
-    /// </summary>
-    [Column(TypeName = "tinyint")]
-    public int MarkerNumber { get; set; }
-
-    /// <summary>
-    /// The UTC datetime of the seasonal marker.
-    /// </summary>
-    [Column(TypeName = "datetime2")]
-    public DateTime UtcDateTime { get; set; }
-
-    #endregion Properties
-
     /// <summary>
     /// Extract the seasonal marker data from the text file and copy the data
     /// into the database.
     /// </summary>
     public static void ParseSeasonalMarkerData()
     {
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
 
         // Lookup table to help with the parsing.
-        Dictionary<string, int> MonthAbbrevs = new()
+        Dictionary<string, int> MonthAbbrevs = new ()
         {
             { "Mar", 3 },
             { "Jun", 6 },
@@ -53,12 +20,12 @@ public class SeasonalMarker
         };
 
         // Get the data from the data file as an array of strings.
-        string dataFilePath =
+        var dataFilePath =
             $"{AstroDbContext.DataDirectory()}/Seasonal markers/SeasonalMarkers2001-2100.txt";
         string[] lines = File.ReadAllLines(dataFilePath);
 
         // Convert the lines into our internal data structure.
-        Regex rx = new("\\s+");
+        Regex rx = new ("\\s+");
         foreach (string line in lines)
         {
             string[] words = rx.Split(line);
@@ -69,19 +36,19 @@ public class SeasonalMarker
             }
 
             // Extract the dates from the row.
-            int year = int.Parse(words[1]);
-            for (int i = 0; i < 4; i++)
+            var year = int.Parse(words[1]);
+            for (var i = 0; i < 4; i++)
             {
                 int j = i * 3;
                 string monthAbbrev = words[j + 2];
                 int month = MonthAbbrevs[monthAbbrev];
-                int dayOfMonth = int.Parse(words[j + 3]);
+                var dayOfMonth = int.Parse(words[j + 3]);
                 string[] time = words[j + 4].Split(":");
-                int hour = int.Parse(time[0]);
-                int minute = int.Parse(time[1]);
+                var hour = int.Parse(time[0]);
+                var minute = int.Parse(time[1]);
 
                 // Construct the new DateTime object.
-                DateTime seasonalMarkerDateTime = new(year, month, dayOfMonth, hour, minute, 0,
+                DateTime seasonalMarkerDateTime = new (year, month, dayOfMonth, hour, minute, 0,
                     DateTimeKind.Utc);
 
                 // Check if there is already an entry in the database table
@@ -115,9 +82,10 @@ public class SeasonalMarker
     /// NB: B and C are in degrees.
     /// </summary>
     /// <returns></returns>
-    public static List<(double A, double B, double C)> PeriodicTerms() =>
-        new()
-        {
+    public static List<(double A, double B, double C)> PeriodicTerms()
+    {
+        return
+        [
             (485, 324.96, 1934.136),
             (203, 337.23, 32964.467),
             (199, 342.08, 20.186),
@@ -142,5 +110,28 @@ public class SeasonalMarker
             (12, 320.81, 34777.259),
             (9, 227.73, 1222.114),
             (8, 15.45, 16859.074)
-        };
+        ];
+    }
+
+    #region Properties
+
+    public int Id { get; set; }
+
+    /// <summary>
+    /// This value is:
+    ///   0 = March equinox
+    ///   1 = June solstice
+    ///   2 = September equinox
+    ///   3 = December solstice
+    /// </summary>
+    [Column(TypeName = "tinyint")]
+    public int MarkerNumber { get; set; }
+
+    /// <summary>
+    /// The UTC datetime of the seasonal marker.
+    /// </summary>
+    [Column(TypeName = "datetime2")]
+    public DateTime UtcDateTime { get; set; }
+
+    #endregion Properties
 }

@@ -1,5 +1,4 @@
 using Galaxon.Numerics.Geometry;
-using Galaxon.Quantities;
 
 namespace Galaxon.Astronomy.Tests;
 
@@ -9,7 +8,7 @@ public class TestSolar
     [TestMethod]
     public void CalcPositionTest()
     {
-        double jdtt = 2448908.5;
+        var jdtt = 2448908.5;
         (double actualL, double actualB) = Solar.CalcPosition(jdtt);
 
         double expectedL = Angle.NormalizeRadians(Angle.DmsToRad(199, 54, 21.82));

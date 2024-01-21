@@ -7,6 +7,7 @@ public class MinorPlanetRecord
 
     // Link to owner.
     public int AstroObjectId { get; set; }
+
     public AstroObject? AstroObject { get; set; }
 
     // The designation in packed form.
@@ -29,6 +30,7 @@ public class MinorPlanetRecord
 
     // The object a trojan or quasi-satellite is co-orbital with.
     public int? CoOrbitalObjectId { get; set; }
+
     public AstroObject? CoOrbitalObject { get; set; }
 
     // Tholen spectral type.

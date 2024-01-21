@@ -17,8 +17,4 @@ public class TempRange
     public double? Max { get; set; }
 
     #endregion Mapped Properties
-
-    public TempRange()
-    {
-    }
 }

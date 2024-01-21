@@ -1,7 +1,7 @@
 using Galaxon.Astronomy.Repository;
 using Galaxon.Core.Exceptions;
+using Galaxon.Numerics.Algebra;
 using Galaxon.Numerics.Geometry;
-using Galaxon.Numerics.Maths;
 using Galaxon.Quantities;
 using GeoCoordinatePortable;
 
@@ -49,8 +49,8 @@ public class World
         double S = sin2G * cos2Lambda + cos2F * sin2Lambda;
         double C = cos2G * cos2Lambda + sin2F * sin2Lambda;
 
-        double omega = Math.Atan(Math.Sqrt(S / C));
-        double R = Math.Sqrt(S * C) / omega;
+        double omega = Atan(Sqrt(S / C));
+        double R = Sqrt(S * C) / omega;
         double D = 2 * omega * radiusEquat;
         double H1 = (3 * R - 1) / 2 / C;
         double H2 = (3 * R + 1) / 2 / S;
@@ -58,9 +58,11 @@ public class World
     }
 
     public static double ShortestDistanceBetween(GeoCoordinate location1,
-        GeoCoordinate location2, Planet planet) =>
-        ShortestDistanceBetween(location1, location2, planet.Physical!.EquatorialRadius,
+        GeoCoordinate location2, Planet planet)
+    {
+        return ShortestDistanceBetween(location1, location2, planet.Physical!.EquatorialRadius,
             planet.Physical.PolarRadius);
+    }
 
     /// <summary>
     /// Calculate the position of a planet in heliocentric ecliptic coordinates.
@@ -84,8 +86,8 @@ public class World
         // Get the VSOP87D data for the planet from the database.
         // These aren't included in Load() so I may need to get them separately
         // rather than via the VSOP87DRecords property.
-        using AstroDbContext db = new();
-        List<VSOP87DRecord>? records = db.VSOP87D
+        using AstroDbContext db = new ();
+        var records = db.VSOP87D
             .Where(r => r.AstroObjectId == planet.Id)
             .ToList();
 
@@ -99,7 +101,7 @@ public class World
         double T = Terran.JulianMillenniaSinceJ2000(jdtt);
 
         // Calculate the coefficients for each coordinate variable.
-        Dictionary<char, double[]> coeffs = new();
+        Dictionary<char, double[]> coeffs = new ();
         foreach (VSOP87DRecord record in records)
         {
             if (!coeffs.ContainsKey(record.Variable))
@@ -113,9 +115,9 @@ public class World
         }
 
         // Calculate each coordinate variable.
-        double L = Angle.NormalizeRadians(Equations.EvaluatePolynomial(coeffs['L'], T));
-        double B = Angle.NormalizeRadians(Equations.EvaluatePolynomial(coeffs['B'], T));
-        double R = Equations.EvaluatePolynomial(coeffs['R'], T) * Length.MetresPerAu;
+        double L = Angle.NormalizeRadians(Polynomials.EvaluatePolynomial(coeffs['L'], T));
+        double B = Angle.NormalizeRadians(Polynomials.EvaluatePolynomial(coeffs['B'], T));
+        double R = Polynomials.EvaluatePolynomial(coeffs['R'], T) * Length.MetresPerAu;
         return (L, B, R);
     }
 }

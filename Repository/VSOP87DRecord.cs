@@ -4,34 +4,6 @@ namespace Galaxon.Astronomy.Repository;
 
 public class VSOP87DRecord
 {
-    #region Properties
-
-    public int Id { get; set; }
-
-    [Column(TypeName = "varchar(10)")]
-    public string PlanetName { get; set; } = "";
-
-    // Link to Planet record.
-    public int AstroObjectId { get; set; }
-    public AstroObject? AstroObject { get; set; }
-
-    [Column(TypeName = "char(1)")]
-    public char Variable { get; set; }
-
-    [Column(TypeName = "tinyint")]
-    public byte Exponent { get; set; }
-
-    [Column(TypeName = "smallint")]
-    public ushort Index { get; set; }
-
-    public double Amplitude { get; set; }
-
-    public double Phase { get; set; }
-
-    public double Frequency { get; set; }
-
-    #endregion Properties
-
     /// <summary>
     /// Parse a VSOP87 data file downloaded from the VSOP87 ftp site.
     /// <see href="ftp://ftp.imcce.fr/pub/ephem/planets/vsop87"/>
@@ -42,11 +14,11 @@ public class VSOP87DRecord
     /// <param name="fileName">The name of the data file.</param>
     public static void ParseDataFile(string fileName)
     {
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
 
         // Get the data from the data file as an array of strings.
-        string dataFilePath = $"{AstroDbContext.DataDirectory()}/VSOP87/{fileName}";
-        using StreamReader sr = new(dataFilePath);
+        var dataFilePath = $"{AstroDbContext.DataDirectory()}/VSOP87/{fileName}";
+        using StreamReader sr = new (dataFilePath);
         while (sr.ReadLine() is { } line)
         {
             Console.WriteLine($"Parsing {line}");
@@ -172,10 +144,10 @@ public class VSOP87DRecord
 
     public static void SetAstroObjectIds()
     {
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
 
         // Get the planet ids.
-        Dictionary<string, int> planetIds = new();
+        Dictionary<string, int> planetIds = new ();
         foreach (Planet? planet in db.Planets)
         {
             planetIds[planet.Name ?? ""] = planet?.Id ?? 0;
@@ -189,4 +161,33 @@ public class VSOP87DRecord
 
         db.SaveChanges();
     }
+
+    #region Properties
+
+    public int Id { get; set; }
+
+    [Column(TypeName = "varchar(10)")]
+    public string PlanetName { get; set; } = "";
+
+    // Link to Planet record.
+    public int AstroObjectId { get; set; }
+
+    public AstroObject? AstroObject { get; set; }
+
+    [Column(TypeName = "char(1)")]
+    public char Variable { get; set; }
+
+    [Column(TypeName = "tinyint")]
+    public byte Exponent { get; set; }
+
+    [Column(TypeName = "smallint")]
+    public ushort Index { get; set; }
+
+    public double Amplitude { get; set; }
+
+    public double Phase { get; set; }
+
+    public double Frequency { get; set; }
+
+    #endregion Properties
 }

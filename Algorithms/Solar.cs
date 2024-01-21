@@ -78,6 +78,8 @@ public static class Solar
     /// <param name="dtut">The instant specified as a DateTime (UT).</param>
     /// <returns>The longitude and latitude of the Sun, in radians, at the given
     /// instant.</returns>
-    public static (double Lng, double Lat) CalcPosition(DateTime dtut) =>
-        CalcPosition(Terran.DateTimeUniversalToJulianDayTerrestrial(dtut));
+    public static (double Lng, double Lat) CalcPosition(DateTime dtut)
+    {
+        return CalcPosition(Terran.DateTimeUniversalToJulianDayTerrestrial(dtut));
+    }
 }

@@ -8,61 +8,6 @@ namespace Galaxon.Astronomy.Repository;
 // All physical quantities are in SI units.
 public abstract class AstroObject
 {
-    #region Properties
-
-    // Primary key.
-    public int Id { get; set; }
-
-    // Object name, e.g. "Sun", "Earth", "Ceres".
-    // These are not assumed to be unique.
-    [Column(TypeName = "varchar(50)")]
-    public string? Name { get; set; }
-
-    // Object number, e.g. 2 (Venus), 301 (Luna), 1 (Ceres).
-    // These numbers aren't unique, and not every object will have one.
-    [Column(TypeName = "int")]
-    public uint? Number { get; set; }
-
-    // The object type, which is also the class name.
-    [Column(TypeName = "varchar(20)")]
-    public string Type { get; }
-
-    // The groups (populations/categories) this object belongs to.
-    public List<AstroObjectGroup>? Groups { get; set; }
-
-    // Link to physical parameters object.
-    public Physical? Physical { get; set; }
-
-    // Link to rotational parameters object.
-    public Rotation? Rotation { get; set; }
-
-    // Link to orbital parameters object.
-    public Orbit? Orbit { get; set; }
-
-    // Link to parent object (i.e. the object being orbited).
-    public int? ParentId { get; set; }
-    public AstroObject? Parent { get; set; }
-
-    // Link to child objects (i.e. the objects orbiting this object).
-    public List<AstroObject>? Children { get; set; }
-
-    // Link to observational parameters object.
-    public Observation? Observation { get; set; }
-
-    // Link to atmosphere object.
-    public Atmosphere? Atmosphere { get; set; }
-
-    // Link to stellar parameters object.
-    public Stellar? Stellar { get; set; }
-
-    // Link to Minor Planet Center record.
-    public MinorPlanetRecord? MinorPlanetRecord { get; set; }
-
-    // VSOP87D records.
-    public List<VSOP87DRecord>? VSOP87DRecords { get; set; }
-
-    #endregion Properties
-
     public AstroObject()
     {
         Type = GetType().Name;
@@ -107,7 +52,10 @@ public abstract class AstroObject
     /// </summary>
     /// <param name="group">The group to check.</param>
     /// <returns>If the object is in the specified group.</returns>
-    public bool IsInGroup(AstroObjectGroup group) => Groups?.Contains(group) ?? false;
+    public bool IsInGroup(AstroObjectGroup group)
+    {
+        return Groups?.Contains(group) ?? false;
+    }
 
     /// <summary>
     /// Check if the object is in a certain group.
@@ -115,9 +63,11 @@ public abstract class AstroObject
     /// <param name="groupName">The name of the group to check (case
     /// sensitive).</param>
     /// <returns>If the object is in the specified group.</returns>
-    public bool IsInGroup(string groupName) =>
-        Groups != null && (Groups
-            .Count(cat => groupName.EqualsIgnoreCase(cat.Name)) > 0);
+    public bool IsInGroup(string groupName)
+    {
+        return Groups != null && Groups
+            .Count(cat => groupName.EqualsIgnoreCase(cat.Name)) > 0;
+    }
 
     /// <summary>
     /// Add the object to a group, if it's not already a member.
@@ -139,7 +89,7 @@ public abstract class AstroObject
     /// <param name="groupName">The group name.</param>
     public void AddToGroup(AstroDbContext db, string groupName)
     {
-        AstroObjectGroup? group = AstroObjectGroup.Load(db, groupName);
+        var group = AstroObjectGroup.Load(db, groupName);
         if (group == null)
         {
             throw new DataNotFoundException($"Group '{groupName}' not found.");
@@ -173,8 +123,10 @@ public abstract class AstroObject
     /// <exception cref="ArgumentNullException">If the search string == null or
     /// empty.</exception>
     public static T? Load<T>(IEnumerable<T> set, Func<AstroObject, bool> searchFunc)
-        where T : AstroObject =>
-        (T?)set.FirstOrDefault(searchFunc);
+        where T : AstroObject
+    {
+        return (T?)set.FirstOrDefault(searchFunc);
+    }
 
     /// <summary>
     /// Load an AstroObject from the database using a function.
@@ -220,4 +172,60 @@ public abstract class AstroObject
 
         return Load(set, searchFunc);
     }
+
+    #region Properties
+
+    // Primary key.
+    public int Id { get; set; }
+
+    // Object name, e.g. "Sun", "Earth", "Ceres".
+    // These are not assumed to be unique.
+    [Column(TypeName = "varchar(50)")]
+    public string? Name { get; set; }
+
+    // Object number, e.g. 2 (Venus), 301 (Luna), 1 (Ceres).
+    // These numbers aren't unique, and not every object will have one.
+    [Column(TypeName = "int")]
+    public uint? Number { get; set; }
+
+    // The object type, which is also the class name.
+    [Column(TypeName = "varchar(20)")]
+    public string Type { get; }
+
+    // The groups (populations/categories) this object belongs to.
+    public List<AstroObjectGroup>? Groups { get; set; }
+
+    // Link to physical parameters object.
+    public Physical? Physical { get; set; }
+
+    // Link to rotational parameters object.
+    public Rotation? Rotation { get; set; }
+
+    // Link to orbital parameters object.
+    public Orbit? Orbit { get; set; }
+
+    // Link to parent object (i.e. the object being orbited).
+    public int? ParentId { get; set; }
+
+    public AstroObject? Parent { get; set; }
+
+    // Link to child objects (i.e. the objects orbiting this object).
+    public List<AstroObject>? Children { get; set; }
+
+    // Link to observational parameters object.
+    public Observation? Observation { get; set; }
+
+    // Link to atmosphere object.
+    public Atmosphere? Atmosphere { get; set; }
+
+    // Link to stellar parameters object.
+    public Stellar? Stellar { get; set; }
+
+    // Link to Minor Planet Center record.
+    public MinorPlanetRecord? MinorPlanetRecord { get; set; }
+
+    // VSOP87D records.
+    public List<VSOP87DRecord>? VSOP87DRecords { get; set; }
+
+    #endregion Properties
 }

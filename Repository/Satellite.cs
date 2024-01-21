@@ -11,7 +11,10 @@ public class Satellite : AstroObject
     /// <param name="searchString">The search string.</param>
     /// <returns>If there's a match.</returns>
     /// TODO Test.
-    public bool IsMatch(string searchString) => searchString.EqualsIgnoreCase(Name);
+    public bool IsMatch(string searchString)
+    {
+        return searchString.EqualsIgnoreCase(Name);
+    }
 
     /// <summary>
     /// Load a satellite from the database.
@@ -20,9 +23,13 @@ public class Satellite : AstroObject
     /// <returns>The Moon object.</returns>
     //public static Satellite? Load(AstroDbContext db, string name)
     //    => db.Satellites.FirstOrDefault(sat => sat.IsMatch(name));
-    public static Satellite? Load(AstroDbContext db, string name) =>
-        AstroObject.Load(db.Satellites, name);
+    public static Satellite? Load(AstroDbContext db, string name)
+    {
+        return Load(db.Satellites, name);
+    }
 
-    public static Satellite? Load(AstroDbContext db, uint num) =>
-        AstroObject.Load(db.Satellites, num);
+    public static Satellite? Load(AstroDbContext db, uint num)
+    {
+        return Load(db.Satellites, num);
+    }
 }

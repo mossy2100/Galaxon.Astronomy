@@ -4,6 +4,6 @@ public class Program
 {
     public static void Main()
     {
-        FractionFinder.TestLeapYearRule2();
+        // FractionFinder.TestLeapYearRule2();
     }
 }

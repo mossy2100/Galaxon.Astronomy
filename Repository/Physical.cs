@@ -1,11 +1,105 @@
 ﻿using Galaxon.Core.Numbers;
-using Galaxon.Numerics.Geometry;
-using GeoCoordinatePortable;
 
 namespace Galaxon.Astronomy.Repository;
 
 public class Physical
 {
+    /// <summary>
+    /// Specify the object's size and shape.
+    /// This can be used for any object. The other methods are for convenience.
+    /// <see cref="SetSphere(double)"/>
+    /// <see cref="SetSpheroid(double, double)"/>
+    /// <see cref="SetEllipsoid(double, double, double)"/>
+    /// <see cref="SetIrregularShape(double, double, double)"/>
+    /// </summary>
+    /// <param name="radiusA">The first radius (or half length).</param>
+    /// <param name="radiusB">The second radius (or half width).</param>
+    /// <param name="radiusC">The third radius (or half height).</param>
+    /// <param name="isRound">
+    /// This flag should be:
+    ///   - true for round objects (stars, planets, dwarf planets, satellite
+    ///     planets)
+    ///   - false for lumpy objects (small bodies, satellite planetoids)
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">If any of the radii are
+    /// 0 or negative.</exception>
+    public void SetSizeAndShape(double radiusA, double radiusB, double radiusC,
+        bool isRound)
+    {
+        if (radiusA <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(radiusA), "Must be a positive value.");
+        }
+        if (radiusB <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(radiusB), "Must be a positive value.");
+        }
+        if (radiusC <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(radiusC), "Must be a positive value.");
+        }
+
+        RadiusA = radiusA;
+        RadiusB = radiusB;
+        RadiusC = radiusC;
+        IsRound = isRound;
+    }
+
+    /// <summary>
+    /// Specify the object is a sphere.
+    /// </summary>
+    /// <param name="radius">The radius.</param>
+    public void SetSphere(double radius)
+    {
+        SetEllipsoid(radius, radius, radius);
+    }
+
+    /// <summary>
+    /// Specify the object is a spheroid.
+    /// </summary>
+    /// <param name="radiusEquat">The equatorial radius in km.</param>
+    /// <param name="radiusPolar">The polar radius in km.</param>
+    public void SetSpheroid(double radiusEquat, double radiusPolar)
+    {
+        SetEllipsoid(radiusEquat, radiusEquat, radiusPolar);
+    }
+
+    /// <summary>
+    /// Specify the object is a scalene ellipsoid.
+    /// </summary>
+    /// <param name="radiusA">The first radius in km.</param>
+    /// <param name="radiusB">The second radius in km.</param>
+    /// <param name="radiusC">The third radius in km.</param>
+    public void SetEllipsoid(double radiusA, double radiusB,
+        double radiusC)
+    {
+        SetSizeAndShape(radiusA, radiusB, radiusC, true);
+
+        // Calculate some stuff; they can still set the property directly if
+        // they want to override this.
+        var ellipsoid = new Ellipsoid(radiusA, radiusB, radiusC);
+
+        // Volumetric mean radius.
+        MeanRadius = ellipsoid.VolumetricMeanRadius;
+
+        // Surface area.
+        SurfaceArea = ellipsoid.SurfaceArea;
+
+        // Volume.
+        Volume = ellipsoid.Volume;
+    }
+
+    /// <summary>
+    /// Specify the object has an irregular (not round) shape.
+    /// </summary>
+    /// <param name="length">The length in km.</param>
+    /// <param name="width">The width in km.</param>
+    /// <param name="height">The height in km.</param>
+    public void SetIrregularShape(double length, double width, double height)
+    {
+        SetSizeAndShape(length / 2, width / 2, height / 2, false);
+    }
+
     #region Properties
 
     // Primary key.
@@ -13,6 +107,7 @@ public class Physical
 
     // Link to owner.
     public int AstroObjectId { get; set; }
+
     public AstroObject? AstroObject { get; set; }
 
     // First radius in km.
@@ -159,93 +254,4 @@ public class Physical
     public double? MaxSurfaceTemp { get; set; }
 
     #endregion Properties
-
-    /// <summary>
-    /// Specify the object's size and shape.
-    /// This can be used for any object. The other methods are for convenience.
-    /// <see cref="SetSphere(double)"/>
-    /// <see cref="SetSpheroid(double, double)"/>
-    /// <see cref="SetEllipsoid(double, double, double)"/>
-    /// <see cref="SetIrregularShape(double, double, double)"/>
-    /// </summary>
-    /// <param name="radiusA">The first radius (or half length).</param>
-    /// <param name="radiusB">The second radius (or half width).</param>
-    /// <param name="radiusC">The third radius (or half height).</param>
-    /// <param name="isRound">
-    /// This flag should be:
-    ///   - true for round objects (stars, planets, dwarf planets, satellite
-    ///     planets)
-    ///   - false for lumpy objects (small bodies, satellite planetoids)
-    /// </param>
-    /// <exception cref="ArgumentOutOfRangeException">If any of the radii are
-    /// 0 or negative.</exception>
-    public void SetSizeAndShape(double radiusA, double radiusB, double radiusC,
-        bool isRound)
-    {
-        if (radiusA <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(radiusA), "Must be a positive value.");
-        }
-        if (radiusB <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(radiusB), "Must be a positive value.");
-        }
-        if (radiusC <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(radiusC), "Must be a positive value.");
-        }
-
-        RadiusA = radiusA;
-        RadiusB = radiusB;
-        RadiusC = radiusC;
-        IsRound = isRound;
-    }
-
-    /// <summary>
-    /// Specify the object is a sphere.
-    /// </summary>
-    /// <param name="radius">The radius.</param>
-    public void SetSphere(double radius) => SetEllipsoid(radius, radius, radius);
-
-    /// <summary>
-    /// Specify the object is a spheroid.
-    /// </summary>
-    /// <param name="radiusEquat">The equatorial radius in km.</param>
-    /// <param name="radiusPolar">The polar radius in km.</param>
-    public void SetSpheroid(double radiusEquat, double radiusPolar) =>
-        SetEllipsoid(radiusEquat, radiusEquat, radiusPolar);
-
-    /// <summary>
-    /// Specify the object is a scalene ellipsoid.
-    /// </summary>
-    /// <param name="radiusA">The first radius in km.</param>
-    /// <param name="radiusB">The second radius in km.</param>
-    /// <param name="radiusC">The third radius in km.</param>
-    public void SetEllipsoid(double radiusA, double radiusB,
-        double radiusC)
-    {
-        SetSizeAndShape(radiusA, radiusB, radiusC, true);
-
-        // Calculate some stuff; they can still set the property directly if
-        // they want to override this.
-        Ellipsoid ellipsoid = new Ellipsoid(radiusA, radiusB, radiusC);
-
-        // Volumetric mean radius.
-        MeanRadius = ellipsoid.VolumetricMeanRadius;
-
-        // Surface area.
-        SurfaceArea = ellipsoid.SurfaceArea;
-
-        // Volume.
-        Volume = ellipsoid.Volume;
-    }
-
-    /// <summary>
-    /// Specify the object has an irregular (not round) shape.
-    /// </summary>
-    /// <param name="length">The length in km.</param>
-    /// <param name="width">The width in km.</param>
-    /// <param name="height">The height in km.</param>
-    public void SetIrregularShape(double length, double width, double height) =>
-        SetSizeAndShape(length / 2, width / 2, height / 2, false);
 }

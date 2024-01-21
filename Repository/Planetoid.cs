@@ -46,7 +46,7 @@ public class Planetoid : AstroObject
     public static Planetoid? Load(AstroDbContext db, string name)
     {
         // Search by name as usual.
-        Planetoid? p = AstroObject.Load(db.Planetoids, name);
+        Planetoid? p = Load(db.Planetoids, name);
         if (p != null)
         {
             return p;
@@ -62,6 +62,8 @@ public class Planetoid : AstroObject
         return mpr == null ? null : db.Planetoids.Find(mpr.AstroObjectId);
     }
 
-    public static Planetoid? Load(AstroDbContext db, uint num) =>
-        AstroObject.Load(db.Planetoids, num);
+    public static Planetoid? Load(AstroDbContext db, uint num)
+    {
+        return Load(db.Planetoids, num);
+    }
 }

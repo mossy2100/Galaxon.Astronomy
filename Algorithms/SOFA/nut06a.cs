@@ -91,7 +91,7 @@ public static partial class SOFA
         double t, fj2;
 
 /* Interval between fundamental date J2000.0 and given date (JC). */
-        t = ((date1 - Terran.DAYS_SINCE_J2000) + date2) / XTimeSpan.DaysPerJulianCentury;
+        t = ((date1 - Terran.DAYS_SINCE_J2000) + date2) / XTimeSpan.DAYS_PER_JULIAN_CENTURY;
 
 /* Factor correcting for secular variation of J2. */
         fj2 = -2.7774e-6 * t;

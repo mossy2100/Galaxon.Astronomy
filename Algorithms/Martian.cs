@@ -11,13 +11,16 @@ public static class Martian
     /// <summary>
     /// Number of days (Earth solar days) per sol (Mars solar day).
     /// </summary>
-    public const double DaysPerSol = 1.02749;
+    public const double DAYS_PER_SOL = 1.02749;
 
-    public static double CalcMarsSolDate(double jd) => (jd - 2405522.0) / DaysPerSol;
+    public static double CalcMarsSolDate(double jd)
+    {
+        return (jd - 2405522.0) / DAYS_PER_SOL;
+    }
 
     public static Planet? GetPlanet()
     {
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
         return Planet.Load(db, "Mars");
     }
 
@@ -28,6 +31,7 @@ public static class Martian
         {
             throw new DataNotFoundException("Could not find Mars in the database.");
         }
+
         return World.CalcPlanetPosition(mars, jdtt);
     }
 }

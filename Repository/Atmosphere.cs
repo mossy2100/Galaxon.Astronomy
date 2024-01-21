@@ -4,35 +4,10 @@ namespace Galaxon.Astronomy.Repository;
 
 public class Atmosphere
 {
-    #region Properties
-
-    // Primary key.
-    public int Id { get; set; }
-
-    // Link to owner.
-    public int AstroObjectId { get; set; }
-    public AstroObject? AstroObject { get; set; }
-
-    // Surface pressure (Pa).
-    public double? SurfacePressure { get; set; }
-
-    // Scale height (km).
-    public double? ScaleHeight { get; set; }
-
-    // Atmosphere constituents.
-    public List<AtmoConstituent> Constituents { get; set; } = new();
-
-    // Is it a surface-bounded exosphere?
-    public bool? IsSurfaceBoundedExosphere { get; set; }
-
-    #endregion Properties
-
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public Atmosphere()
-    {
-    }
+    public Atmosphere() { }
 
     /// <summary>
     /// Add a constituent to the atmosphere.
@@ -71,4 +46,28 @@ public class Atmosphere
             constituent.Percentage = percentage;
         }
     }
+
+    #region Properties
+
+    // Primary key.
+    public int Id { get; set; }
+
+    // Link to owner.
+    public int AstroObjectId { get; set; }
+
+    public AstroObject? AstroObject { get; set; }
+
+    // Surface pressure (Pa).
+    public double? SurfacePressure { get; set; }
+
+    // Scale height (km).
+    public double? ScaleHeight { get; set; }
+
+    // Atmosphere constituents.
+    public List<AtmoConstituent> Constituents { get; set; } = new ();
+
+    // Is it a surface-bounded exosphere?
+    public bool? IsSurfaceBoundedExosphere { get; set; }
+
+    #endregion Properties
 }

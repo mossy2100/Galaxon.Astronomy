@@ -1,11 +1,12 @@
 ﻿using System.Data;
 using System.Globalization;
 using Galaxon.Astronomy.Repository;
+using Galaxon.Astronomy.Repository.Enums;
 using Galaxon.Core.Exceptions;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
+using Galaxon.Numerics.Algebra;
 using Galaxon.Numerics.Geometry;
-using Galaxon.Numerics.Maths;
 
 namespace Galaxon.Astronomy.Algorithms;
 
@@ -23,22 +24,6 @@ namespace Galaxon.Astronomy.Algorithms;
 /// </summary>
 public static class Terran
 {
-    #region Constants
-
-    /// <summary>
-    /// Number of seconds difference between TAI and TT.
-    /// TT = TAI + 32.184
-    /// </summary>
-    public const double TT_MINUS_TAI = 32.184;
-
-    /// <summary>
-    /// The number of days difference between the start of the Julian epoch and
-    /// the start of the J2000 epoch.
-    /// </summary>
-    public const double DAYS_SINCE_J2000 = 2451545.0;
-
-    #endregion Constants
-
     /// <summary>
     /// Converts a Gregorian date into a single value: the year with a
     /// fractional part indicating position in the year.
@@ -69,7 +54,7 @@ public static class Terran
         }
 
         // Check day is valid.
-        GregorianCalendar gc = new();
+        GregorianCalendar gc = new ();
         int daysInMonth = gc.GetDaysInMonth(year, month);
         if (day < 1 || day > daysInMonth)
         {
@@ -78,7 +63,7 @@ public static class Terran
         }
 
         // Calculate fraction of year.
-        DateTime dt = new(year, month, day, 0, 0, 0, DateTimeKind.Utc);
+        DateTime dt = new (year, month, day, 0, 0, 0, DateTimeKind.Utc);
         double frac = (dt.DayOfYear - 1.0) / gc.GetDaysInYear(year);
         return year + frac;
     }
@@ -135,7 +120,7 @@ public static class Terran
                 break;
 
             case > -500 and <= 500:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     10583.6,
                     -1014.41,
@@ -148,7 +133,7 @@ public static class Terran
                 break;
 
             case > 500 and <= 1600:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     1574.2,
                     -556.01,
@@ -161,7 +146,7 @@ public static class Terran
                 break;
 
             case > 1600 and <= 1700:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     120,
                     -0.9808,
@@ -171,7 +156,7 @@ public static class Terran
                 break;
 
             case > 1700 and <= 1800:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     8.83,
                     0.1603,
@@ -182,7 +167,7 @@ public static class Terran
                 break;
 
             case > 1800 and <= 1860:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     13.72,
                     -0.332447,
@@ -196,7 +181,7 @@ public static class Terran
                 break;
 
             case > 1860 and <= 1900:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     7.62,
                     0.5737,
@@ -208,7 +193,7 @@ public static class Terran
                 break;
 
             case > 1900 and <= 1920:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     -2.79,
                     1.494119,
@@ -219,7 +204,7 @@ public static class Terran
                 break;
 
             case > 1920 and <= 1941:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     21.20,
                     0.84493,
@@ -229,7 +214,7 @@ public static class Terran
                 break;
 
             case > 1941 and <= 1961:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     29.07,
                     0.407,
@@ -239,7 +224,7 @@ public static class Terran
                 break;
 
             case > 1961 and <= 1986:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     45.45,
                     1.067,
@@ -249,7 +234,7 @@ public static class Terran
                 break;
 
             case > 1986 and <= 2005:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     63.86,
                     0.3345,
@@ -261,7 +246,7 @@ public static class Terran
                 break;
 
             case > 2005 and <= 2050:
-                deltaT = Equations.EvaluatePolynomial(new[]
+                deltaT = Polynomials.EvaluatePolynomial(new[]
                 {
                     62.92,
                     0.32217,
@@ -298,10 +283,15 @@ public static class Terran
     /// </summary>
     /// <param name="dt">A point in time. Defaults to current DateTime.</param>
     /// <returns></returns>
-    public static double CalcDeltaT(DateTime dt = new DateTime()) =>
-        CalcDeltaT(dt.Year, dt.Month, dt.Day);
+    public static double CalcDeltaT(DateTime dt = new ())
+    {
+        return CalcDeltaT(dt.Year, dt.Month, dt.Day);
+    }
 
-    public static double CalcDeltaT(double jd) => CalcDeltaT(XDateTime.FromJulianDay(jd));
+    public static double CalcDeltaT(double jd)
+    {
+        return CalcDeltaT(XDateTime.FromJulianDay(jd));
+    }
 
     /// <summary>
     /// Given a Julian Day in Universal Time (JD), find the equivalent in
@@ -310,8 +300,10 @@ public static class Terran
     /// </summary>
     /// <param name="jdut">Julian Day value in Universal Time</param>
     /// <returns>Julian Day in Terrestrial Time</returns>
-    public static double JulianDayUniversalToTerrestrial(double jdut) =>
-        jdut + TimeSpan.FromSeconds(CalcDeltaT(jdut)).TotalDays;
+    public static double JulianDayUniversalToTerrestrial(double jdut)
+    {
+        return jdut + TimeSpan.FromSeconds(CalcDeltaT(jdut)).TotalDays;
+    }
 
     /// <summary>
     /// Convert a Julian Day value in Terrestrial Time (TT) (also known as the
@@ -320,14 +312,20 @@ public static class Terran
     /// </summary>
     /// <param name="jdtt">Julian Day in Terrestrial Time</param>
     /// <returns>Julian Day value in Universal Time</returns>
-    public static double JulianDayTerrestrialToUniversal(double jdtt) =>
-        jdtt - TimeSpan.FromSeconds(CalcDeltaT(jdtt)).TotalDays;
+    public static double JulianDayTerrestrialToUniversal(double jdtt)
+    {
+        return jdtt - TimeSpan.FromSeconds(CalcDeltaT(jdtt)).TotalDays;
+    }
 
-    public static double DateTimeUniversalToJulianDayTerrestrial(DateTime dtut) =>
-        JulianDayUniversalToTerrestrial(dtut.ToJulianDay());
+    public static double DateTimeUniversalToJulianDayTerrestrial(DateTime dtut)
+    {
+        return JulianDayUniversalToTerrestrial(dtut.ToJulianDay());
+    }
 
-    public static DateTime JulianDayTerrestrialToDateTimeUniversal(double jdtt) =>
-        XDateTime.FromJulianDay(JulianDayTerrestrialToUniversal(jdtt));
+    public static DateTime JulianDayTerrestrialToDateTimeUniversal(double jdtt)
+    {
+        return XDateTime.FromJulianDay(JulianDayTerrestrialToUniversal(jdtt));
+    }
 
     /// <summary>
     /// Find out how many leap seconds there were or have been prior to the
@@ -339,7 +337,7 @@ public static class Terran
     /// <returns>The number of leap seconds until then.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If year less than
     /// 1972.</exception>
-    public static byte LeapSecondCount(DateTime dt = new DateTime())
+    public static byte LeapSecondCount(DateTime dt = new ())
     {
         // Check for valid year.
         if (dt.Year < 1972)
@@ -359,8 +357,10 @@ public static class Terran
     /// DateTime.</param>
     /// <returns>The integer number of seconds difference.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If year less than 1972.</exception>
-    public static byte CalcTAIMinusUTC(DateTime dt = new ()) =>
-        (byte)(10 + LeapSecondCount(dt));
+    public static byte CalcTAIMinusUTC(DateTime dt = new ())
+    {
+        return (byte)(10 + LeapSecondCount(dt));
+    }
 
     /// <summary>
     /// Calculate the difference between UT1 and UTC in seconds.
@@ -382,8 +382,10 @@ public static class Terran
     /// DateTime.</param>
     /// <returns>The difference between UT1 and UTC.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If year less than 1972.</exception>
-    public static double CalcDUT1(DateTime dt = new DateTime()) =>
-        TT_MINUS_TAI - CalcDeltaT(dt) + CalcTAIMinusUTC(dt);
+    public static double CalcDUT1(DateTime dt = new ())
+    {
+        return TT_MINUS_TAI - CalcDeltaT(dt) + CalcTAIMinusUTC(dt);
+    }
 
     /// <summary>
     /// The start point of the J2000 epoch in UTC.
@@ -393,39 +395,50 @@ public static class Terran
     /// </summary>
     /// <returns>A DateTime object representing the start point of the J2000
     /// epoch in UTC.</returns>
-    public static DateTime J2000StartUTC() =>
-        new DateTime(2000, 1, 1, 11, 58, 55, 816, DateTimeKind.Utc);
+    public static DateTime J2000StartUTC()
+    {
+        return new DateTime(2000, 1, 1, 11, 58, 55, 816, DateTimeKind.Utc);
+    }
 
     /// <summary>
     /// Number of days since beginning of the J2000.0 epoch, in TT.
     /// </summary>
     /// <param name="jdtt">The Julian Ephemeris Day.</param>
     /// <returns></returns>
-    public static double JulianDaysSinceJ2000(double jdtt) => jdtt - DAYS_SINCE_J2000;
+    public static double JulianDaysSinceJ2000(double jdtt)
+    {
+        return jdtt - DAYS_SINCE_J2000;
+    }
 
     /// <summary>
     /// Number of Julian years since beginning of the J2000.0 epoch, in TT.
     /// </summary>
     /// <param name="jdtt">The Julian Ephemeris Day.</param>
     /// <returns></returns>
-    public static double JulianYearsSinceJ2000(double jdtt) =>
-        JulianDaysSinceJ2000(jdtt) / XTimeSpan.DaysPerJulianYear;
+    public static double JulianYearsSinceJ2000(double jdtt)
+    {
+        return JulianDaysSinceJ2000(jdtt) / XTimeSpan.DAYS_PER_JULIAN_YEAR;
+    }
 
     /// <summary>
     /// Number of Julian centuries since beginning of the J2000.0 epoch, in TT.
     /// </summary>
     /// <param name="jdtt">The Julian Ephemeris Day.</param>
     /// <returns></returns>
-    public static double JulianCenturiesSinceJ2000(double jdtt) =>
-        JulianDaysSinceJ2000(jdtt) / XTimeSpan.DaysPerJulianCentury;
+    public static double JulianCenturiesSinceJ2000(double jdtt)
+    {
+        return JulianDaysSinceJ2000(jdtt) / XTimeSpan.DAYS_PER_JULIAN_CENTURY;
+    }
 
     /// <summary>
     /// Number of Julian millennia since beginning of the J2000.0 epoch, in TT.
     /// </summary>
     /// <param name="jdtt">The Julian Ephemeris Day.</param>
     /// <returns></returns>
-    public static double JulianMillenniaSinceJ2000(double jdtt) =>
-        JulianDaysSinceJ2000(jdtt) / XTimeSpan.DaysPerJulianMillennium;
+    public static double JulianMillenniaSinceJ2000(double jdtt)
+    {
+        return JulianDaysSinceJ2000(jdtt) / XTimeSpan.DAYS_PER_JULIAN_MILLENNIUM;
+    }
 
     /// <summary>
     /// Calculate the Earth Rotation Angle from the Julian Day in UT1.
@@ -437,7 +450,7 @@ public static class Terran
     public static double CalcERA(double jdut)
     {
         double t = JulianDaysSinceJ2000(jdut);
-        double radians = Math.Tau * (0.779_057_273_264 + 1.002_737_811_911_354_48 * t);
+        double radians = Tau * (0.779_057_273_264 + 1.002_737_811_911_354_48 * t);
         return Angle.NormalizeRadians(radians);
     }
 
@@ -446,11 +459,14 @@ public static class Terran
     /// </summary>
     /// <param name="dtut">The instant.</param>
     /// <returns>The ERA at the given instant.</returns>
-    public static double CalcERA(DateTime dtut) => CalcERA(dtut.ToJulianDay());
+    public static double CalcERA(DateTime dtut)
+    {
+        return CalcERA(dtut.ToJulianDay());
+    }
 
     public static Planet? GetPlanet()
     {
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
         return Planet.Load(db, "Earth");
     }
 
@@ -482,9 +498,9 @@ public static class Terran
     public static double CalcDeltaTMeeus(int year, int month = 1, int day = 1)
     {
         // Get the year as a double.
-        double y = Terran.CalcDecimalYear(year, month, day);
+        double y = CalcDecimalYear(year, month, day);
 
-        using AstroDbContext db = new();
+        using AstroDbContext db = new ();
 
         // Calculate deltaT.
         double deltaT;
@@ -507,7 +523,7 @@ public static class Terran
 
             case >= 1620 and < 2000:
                 // Check if the value is an even integer.
-                int y1 = (int)(Floor(y / 2) * 2);
+                var y1 = (int)(Floor(y / 2) * 2);
                 if (y.FuzzyEquals(y1))
                 {
                     // Get this entry from the database.
@@ -542,7 +558,7 @@ public static class Terran
     {
         for (int y = -1999; y <= 3000; y++)
         {
-            double deltaTNasa = Terran.CalcDeltaT(y);
+            double deltaTNasa = CalcDeltaT(y);
             double deltaTMeeus = CalcDeltaTMeeus(y);
             double diff = Abs(deltaTMeeus - deltaTNasa);
         }
@@ -550,12 +566,12 @@ public static class Terran
 
     public static void TestCalcDUT1()
     {
-        for (int y = 1972; y <= 2022; y++)
+        for (var y = 1972; y <= 2022; y++)
         {
-            DateTime dt = new DateTime(y, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            byte LSC = Terran.LeapSecondCount(dt);
-            double deltaT = Terran.CalcDeltaT(dt);
-            double DUT1 = Terran.CalcDUT1(dt);
+            var dt = new DateTime(y, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            byte LSC = LeapSecondCount(dt);
+            double deltaT = CalcDeltaT(dt);
+            double DUT1 = CalcDUT1(dt);
             Console.WriteLine($"Year={y}, LSC={LSC}, ∆T={deltaT}, DUT1={DUT1}");
             if (Abs(DUT1) > 0.9)
             {
@@ -592,7 +608,7 @@ public static class Terran
             return markerNumber switch
             {
                 ESeasonalMarker.MarchEquinox =>
-                    Equations.EvaluatePolynomial(new[]
+                    Polynomials.EvaluatePolynomial(new[]
                     {
                         1721139.29189,
                         365242.13740,
@@ -601,7 +617,7 @@ public static class Terran
                         -0.00071
                     }, Y),
                 ESeasonalMarker.JuneSolstice =>
-                    Equations.EvaluatePolynomial(new[]
+                    Polynomials.EvaluatePolynomial(new[]
                     {
                         1721233.25401,
                         365241.72562,
@@ -610,7 +626,7 @@ public static class Terran
                         0.00025
                     }, Y),
                 ESeasonalMarker.SeptemberEquinox =>
-                    Equations.EvaluatePolynomial(new[]
+                    Polynomials.EvaluatePolynomial(new[]
                     {
                         1721325.70455,
                         365242.49558,
@@ -619,7 +635,7 @@ public static class Terran
                         0.00074
                     }, Y),
                 ESeasonalMarker.DecemberSolstice =>
-                    Equations.EvaluatePolynomial(new[]
+                    Polynomials.EvaluatePolynomial(new[]
                     {
                         1721414.39987,
                         365242.88257,
@@ -627,7 +643,7 @@ public static class Terran
                         -0.00933,
                         -0.00006
                     }, Y),
-                _ => throw new ArgumentOutOfRangeException(nameof(markerNumber), "Invalid value."),
+                _ => throw new ArgumentOutOfRangeException(nameof(markerNumber), "Invalid value.")
             };
         }
 
@@ -635,7 +651,7 @@ public static class Terran
         return markerNumber switch
         {
             ESeasonalMarker.MarchEquinox =>
-                Equations.EvaluatePolynomial(new[]
+                Polynomials.EvaluatePolynomial(new[]
                 {
                     2451623.80984,
                     365242.37404,
@@ -644,7 +660,7 @@ public static class Terran
                     -0.00057
                 }, Y),
             ESeasonalMarker.JuneSolstice =>
-                Equations.EvaluatePolynomial(new[]
+                Polynomials.EvaluatePolynomial(new[]
                 {
                     2451716.56767,
                     365241.62603,
@@ -653,7 +669,7 @@ public static class Terran
                     -0.0003
                 }, Y),
             ESeasonalMarker.SeptemberEquinox =>
-                Equations.EvaluatePolynomial(new[]
+                Polynomials.EvaluatePolynomial(new[]
                 {
                     2451810.21715,
                     365242.01767,
@@ -662,7 +678,7 @@ public static class Terran
                     0.00078
                 }, Y),
             ESeasonalMarker.DecemberSolstice =>
-                Equations.EvaluatePolynomial(new[]
+                Polynomials.EvaluatePolynomial(new[]
                 {
                     2451900.05952,
                     365242.74049,
@@ -670,7 +686,7 @@ public static class Terran
                     -0.00823,
                     0.00032
                 }, Y),
-            _ => throw new ArgumentOutOfRangeException(nameof(markerNumber), "Invalid value."),
+            _ => throw new ArgumentOutOfRangeException(nameof(markerNumber), "Invalid value.")
         };
     }
 
@@ -684,7 +700,7 @@ public static class Terran
     public static DateTime CalcSeasonalMarkerApprox(int year, ESeasonalMarker markerNumber)
     {
         double JDE0 = CalcSeasonalMarkerMean(year, markerNumber);
-        double T = Terran.JulianCenturiesSinceJ2000(JDE0);
+        double T = JulianCenturiesSinceJ2000(JDE0);
         double W = Angle.DegToRad(35999.373 * T - 2.47);
         double dLambda = 1 + 0.0334 * Cos(W) + 0.0007 * Cos(2 * W);
 
@@ -693,13 +709,13 @@ public static class Terran
         double S = terms.Sum(term => term.A * Cos(Angle.DegToRad(term.B + term.C * T)));
 
         // Equation from p178.
-        double jdtt = JDE0 + (0.00001 * S) / dLambda;
+        double jdtt = JDE0 + 0.00001 * S / dLambda;
 
         // Get the date in Terrestrial Time (TT).
         DateTime dttt = XDateTime.FromJulianDay(jdtt);
 
         // Subtract ∆T to get Universal Time.
-        long deltaT_ticks = (long)(CalcDeltaT(dttt) / XTimeSpan.SecondsPerTick);
+        var deltaT_ticks = (long)(CalcDeltaT(dttt) / XTimeSpan.SECONDS_PER_TICK);
         DateTime UT = dttt.Subtract(new TimeSpan(deltaT_ticks));
         return UT;
     }
@@ -732,4 +748,20 @@ public static class Terran
 
         return XDateTime.FromJulianDay(jd);
     }
+
+    #region Constants
+
+    /// <summary>
+    /// Number of seconds difference between TAI and TT.
+    /// TT = TAI + 32.184
+    /// </summary>
+    public const double TT_MINUS_TAI = 32.184;
+
+    /// <summary>
+    /// The number of days difference between the start of the Julian epoch and
+    /// the start of the J2000 epoch.
+    /// </summary>
+    public const double DAYS_SINCE_J2000 = 2451545.0;
+
+    #endregion Constants
 }

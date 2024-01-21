@@ -9,6 +9,7 @@ public class Rotation
 
     // Link to owner.
     public int AstroObjectId { get; set; }
+
     public AstroObject? AstroObject { get; set; }
 
     // Sidereal rotation period in days.
@@ -30,8 +31,4 @@ public class Rotation
     public double? NorthPoleDeclination { get; set; }
 
     #endregion Properties
-
-    public Rotation()
-    {
-    }
 }

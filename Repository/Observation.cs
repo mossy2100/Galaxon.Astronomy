@@ -9,6 +9,7 @@ public class Observation
 
     // Link to owner.
     public int AstroObjectId { get; set; }
+
     public AstroObject? AstroObject { get; set; }
 
     // Absolute magnitude.
@@ -27,8 +28,4 @@ public class Observation
     public double? MaxAngularDiam { get; set; }
 
     #endregion Properties
-
-    public Observation()
-    {
-    }
 }
