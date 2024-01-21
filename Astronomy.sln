@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Program", "Program\Program.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithms", "Algorithms\Algorithms.csproj", "{D66EDA98-F2AD-4E77-892E-4775E3CBE074}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOFA", "SOFA\SOFA.csproj", "{B69A71D3-ACBE-43BE-9619-57001158AE8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{D66EDA98-F2AD-4E77-892E-4775E3CBE074}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D66EDA98-F2AD-4E77-892E-4775E3CBE074}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D66EDA98-F2AD-4E77-892E-4775E3CBE074}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E88D638A-8219-48C2-B2EB-20D6BBDDC123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E88D638A-8219-48C2-B2EB-20D6BBDDC123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E88D638A-8219-48C2-B2EB-20D6BBDDC123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E88D638A-8219-48C2-B2EB-20D6BBDDC123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BA85F1D-1A17-4DDE-AB17-4C0F83141EB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BA85F1D-1A17-4DDE-AB17-4C0F83141EB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BA85F1D-1A17-4DDE-AB17-4C0F83141EB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BA85F1D-1A17-4DDE-AB17-4C0F83141EB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B69A71D3-ACBE-43BE-9619-57001158AE8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B69A71D3-ACBE-43BE-9619-57001158AE8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B69A71D3-ACBE-43BE-9619-57001158AE8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B69A71D3-ACBE-43BE-9619-57001158AE8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

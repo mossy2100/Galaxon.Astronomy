@@ -1,4 +1,5 @@
-﻿using Galaxon.Numerics.Geometry;
+﻿using Galaxon.Astronomy.SOFA;
+using Galaxon.Numerics.Geometry;
 using Galaxon.Quantities;
 
 namespace Galaxon.Astronomy.Algorithms;
@@ -35,8 +36,8 @@ public static class Solar
 
         // To obtain the apparent longitude, nutation and aberration have to be
         // taken into account.
-        double nutLng = SOFA.iauNut06a(jdtt).dpsi;
-        lngSun += nutLng;
+        SofaLibrary.iauNut06a(jdtt, 0, out double dpsi, out double deps);
+        lngSun += dpsi;
 
         // Calculate and add aberration.
         double julMil = julCen / 10;

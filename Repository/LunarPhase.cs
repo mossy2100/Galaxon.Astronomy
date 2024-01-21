@@ -1,16 +1,5 @@
 ﻿namespace Galaxon.Astronomy.Repository;
 
-public enum ELunarPhase
-{
-    NewMoon = 0,
-
-    FirstQuarter = 1,
-
-    FullMoon = 2,
-
-    ThirdQuarter = 3
-}
-
 public class LunarPhase
 {
     /// <summary>
