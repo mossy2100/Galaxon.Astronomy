@@ -1,7 +1,8 @@
 using Galaxon.Astronomy.Models;
+using Galaxon.Numerics.Geometry;
 using GeoCoordinatePortable;
 
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 public static class DistanceService
 {

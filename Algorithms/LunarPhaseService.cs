@@ -1,4 +1,4 @@
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 public class LunarPhaseService
 {

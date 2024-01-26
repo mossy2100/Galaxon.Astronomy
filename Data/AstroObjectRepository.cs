@@ -1,7 +1,7 @@
 using Galaxon.Astronomy.Models;
 using Galaxon.Core.Exceptions;
 
-namespace Galaxon.Astronomy.Database;
+namespace Galaxon.Astronomy.Data;
 
 public class AstroObjectRepository(AstroDbContext dbContext)
 {

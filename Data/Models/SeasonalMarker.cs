@@ -1,4 +1,4 @@
-﻿using Galaxon.Astronomy.Database;
+﻿using Galaxon.Astronomy.Data;
 
 namespace Galaxon.Astronomy.Models;
 

@@ -1,8 +1,9 @@
 using Galaxon.Astronomy.Enums;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Algebra;
+using Galaxon.Numerics.Geometry;
 
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 public class SeasonalMarkerService(SunService sunService)
 {

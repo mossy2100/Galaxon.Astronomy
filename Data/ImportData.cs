@@ -2,12 +2,12 @@ using System.Globalization;
 using CsvHelper;
 using Galaxon.Astronomy.Enums;
 using Galaxon.Astronomy.Models;
-using Galaxon.Astronomy.Services;
+using Galaxon.Core.Exceptions;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Strings;
 using Galaxon.Core.Time;
 
-namespace Galaxon.Astronomy.Database;
+namespace Galaxon.Astronomy.Data;
 
 public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository astroObjectRepository)
 {
@@ -695,12 +695,35 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
             }
         }
     }
+    /// <summary>
+    /// Get a planet name given a number.
+    /// </summary>
+    /// <param name="num">The planet number as used in VSOP87 data.</param>
+    /// <returns>The planet name.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// If the number is not in the range 1..8.
+    /// </exception>
+    public static string PlanetNumberToName(byte num)
+    {
+        return num switch
+        {
+            1 => "Mercury",
+            2 => "Venus",
+            3 => "Earth",
+            4 => "Mars",
+            5 => "Jupiter",
+            6 => "Saturn",
+            7 => "Uranus",
+            8 => "Neptune",
+            _ => throw new MatchNotFoundException("Planet number must be in the range 1..8.")
+        };
+    }
 
     public void ParseAllVSOP87DataFiles()
     {
         for (byte planetNum = 1; planetNum <= 8; planetNum++)
         {
-            string name = PlanetService.PlanetNumberToName(planetNum);
+            string name = PlanetNumberToName(planetNum);
             string abbrev = name[..3].ToLower();
             ParseVSOP87DataFile($"VSOP87D.{abbrev}");
         }

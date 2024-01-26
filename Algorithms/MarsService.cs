@@ -1,7 +1,7 @@
-﻿using Galaxon.Astronomy.Database;
+﻿using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
 
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 /// <summary>
 /// A container for constants and static methods related to Mars.

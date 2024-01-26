@@ -1,9 +1,10 @@
-using Galaxon.Astronomy.Database;
+using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Enums;
 using Galaxon.Astronomy.Models;
 using Galaxon.Core.Time;
+using Galaxon.Numerics.Geometry;
 
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 public class MoonService
 {

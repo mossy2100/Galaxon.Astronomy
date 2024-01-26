@@ -1,10 +1,11 @@
 ﻿using System.Data;
-using Galaxon.Astronomy.Database;
+using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
+using Galaxon.Numerics.Geometry;
 
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 /// <summary>
 /// This is a static class containing useful methods and constants relating to

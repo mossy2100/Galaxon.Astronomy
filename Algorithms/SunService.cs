@@ -1,9 +1,11 @@
-﻿using Galaxon.Astronomy.Database;
+﻿using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
+using Galaxon.Numerics.Geometry;
+using Galaxon.Quantities;
 
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 public class SunService(
     AstroDbContext astroDbContext,

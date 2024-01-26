@@ -4,8 +4,8 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AssemblyName>Galaxon.Astronomy</AssemblyName>
-        <RootNamespace>Galaxon.Astronomy</RootNamespace>
+        <AssemblyName>Galaxon.Astronomy.Data</AssemblyName>
+        <RootNamespace>Galaxon.Astronomy.Data</RootNamespace>
     </PropertyGroup>
     
     <ItemGroup>
@@ -41,15 +41,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Database\Migrations\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Remove="Models\old\**" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="Models\old\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
     </ItemGroup>
     
 </Project>

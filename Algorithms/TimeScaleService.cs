@@ -1,13 +1,13 @@
 using System.Data;
 using System.Globalization;
-using Galaxon.Astronomy.Database;
+using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
 using Galaxon.Core.Exceptions;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Algebra;
 
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 public class TimeScaleService
 {

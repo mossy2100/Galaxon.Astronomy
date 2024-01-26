@@ -1,6 +1,6 @@
-﻿using Galaxon.Astronomy.Database;
+﻿using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
-using Galaxon.Astronomy.Services;
+using Galaxon.Astronomy.Algorithms;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 using Galaxon.Quantities;

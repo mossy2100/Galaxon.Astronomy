@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Galaxon.Astronomy.Database;
+namespace Galaxon.Astronomy.Data;
 
 /// <summary>
 /// Handles the database connection and operations.

@@ -1,36 +1,14 @@
-using Galaxon.Astronomy.Database;
+using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
 using Galaxon.Core.Exceptions;
 using Galaxon.Numerics.Algebra;
+using Galaxon.Numerics.Geometry;
+using Galaxon.Quantities;
 
-namespace Galaxon.Astronomy.Services;
+namespace Galaxon.Astronomy.Algorithms;
 
 public class PlanetService
 {
-    /// <summary>
-    /// Get a planet name given a number.
-    /// </summary>
-    /// <param name="num">The planet number as used in VSOP87 data.</param>
-    /// <returns>The planet name.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">
-    /// If the number is not in the range 1..8.
-    /// </exception>
-    public static string PlanetNumberToName(byte num)
-    {
-        return num switch
-        {
-            1 => "Mercury",
-            2 => "Venus",
-            3 => "Earth",
-            4 => "Mars",
-            5 => "Jupiter",
-            6 => "Saturn",
-            7 => "Uranus",
-            8 => "Neptune",
-            _ => throw new MatchNotFoundException("Planet number must be in the range 1..8.")
-        };
-    }
-
     /// <summary>
     /// Calculate the position of a planet in heliocentric ecliptic coordinates.
     /// Algorithm is from AA2 p218.
