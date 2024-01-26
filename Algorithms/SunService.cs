@@ -11,7 +11,7 @@ public class SunService(
     AstroDbContext astroDbContext,
     AstroObjectRepository astroObjectRepository,
     EarthService earthService,
-    TimeScaleService timeScaleService)
+    PlanetService planetService)
 {
     /// <summary>
     /// Initialize the Stars data, which for now just means adding the Sun to the database.
@@ -159,7 +159,7 @@ public class SunService(
         // Get the Earth's heliocentric position.
         var earth = earthService.GetPlanet();
         (double lngEarth, double latEarth, double R_m) =
-            PlanetService.CalcPlanetPosition(earth, jdtt);
+            planetService.CalcPlanetPosition(earth, jdtt);
 
         // Reverse to get the mean dynamical ecliptic and equinox of the date.
         double lngSun = Angle.NormalizeRadians(lngEarth + PI);

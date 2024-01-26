@@ -2,6 +2,7 @@ using System.Globalization;
 using Galaxon.Astronomy.Enums;
 using Galaxon.Astronomy.Models;
 using Galaxon.Astronomy.Algorithms;
+using Galaxon.Astronomy.Data;
 using Newtonsoft.Json;
 
 namespace Galaxon.Astronomy.Tests;
@@ -9,6 +10,20 @@ namespace Galaxon.Astronomy.Tests;
 [TestClass]
 public class TestLunarPhases
 {
+    private AstroDbContext? _astroDbContext;
+
+    private AstroObjectRepository? _astroObjectRepository;
+
+    private MoonService? _moonService;
+
+    [TestInitialize]
+    public void Init()
+    {
+        _astroDbContext = new AstroDbContext();
+        _astroObjectRepository = new AstroObjectRepository(_astroDbContext);
+        _moonService = new MoonService(_astroObjectRepository);
+    }
+
     /// <summary>
     /// Test example 49a from Astronomical Algorithms 2nd ed.
     /// </summary>
@@ -16,7 +31,8 @@ public class TestLunarPhases
     public void TestExample49a()
     {
         DateTime dtApprox = new (1977, 2, 15);
-        LunarPhase phase = MoonService.PhaseFromDateTime(dtApprox);
+        LunarPhase phase = _moonService!.PhaseFromDateTime(dtApprox);
+
         Assert.AreEqual(ELunarPhase.NewMoon, phase.PhaseNumber);
         Assert.AreEqual(1977, phase.UtcDateTime.Year);
         Assert.AreEqual(2, phase.UtcDateTime.Month);
@@ -32,7 +48,7 @@ public class TestLunarPhases
     public void TestExample49b()
     {
         DateTime dtApprox = new (2044, 1, 20);
-        LunarPhase phase = MoonService.PhaseFromDateTime(dtApprox);
+        LunarPhase phase = _moonService!.PhaseFromDateTime(dtApprox);
         Assert.AreEqual(ELunarPhase.ThirdQuarter, phase.PhaseNumber);
         Assert.AreEqual(2044, phase.UtcDateTime.Year);
         Assert.AreEqual(1, phase.UtcDateTime.Month);
@@ -50,7 +66,8 @@ public class TestLunarPhases
     public void CompareWithAstroPixels()
     {
         // Read in the phases.
-        string jsonFilePath = "/Users/shaun/Documents/Web & software development/C#/Projects/Galaxon/Astronomy/AstronomyTests/data/LunarPhases2023.json";
+        string jsonFilePath =
+            "/Users/shaun/Documents/Web & software development/C#/Projects/Galaxon/Astronomy/AstronomyTests/data/LunarPhases2023.json";
         string json = File.ReadAllText(jsonFilePath);
         string[][]? data = JsonConvert.DeserializeObject<string[][]>(json);
 
@@ -61,7 +78,7 @@ public class TestLunarPhases
 
         // Find the phases for the year.
         int y = 2023;
-        List<LunarPhase> phases = MoonService.PhasesInYear(y);
+        List<LunarPhase> phases = _moonService!.PhasesInYear(y);
 
         // Count phases.
         Assert.AreEqual(data.Length, phases.Count);

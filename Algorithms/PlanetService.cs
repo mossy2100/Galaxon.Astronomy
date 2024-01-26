@@ -7,7 +7,7 @@ using Galaxon.Quantities;
 
 namespace Galaxon.Astronomy.Algorithms;
 
-public class PlanetService
+public class PlanetService(AstroDbContext astroDbContext)
 {
     /// <summary>
     /// Calculate the position of a planet in heliocentric ecliptic coordinates.
@@ -26,13 +26,12 @@ public class PlanetService
     /// coordinates.</returns>
     /// <exception cref="DataNotFoundException">If no VSOP87D data could be
     /// found for the planet.</exception>
-    public static (double L, double B, double R) CalcPlanetPosition(AstroObject planet, double jdtt)
+    public (double L, double B, double R) CalcPlanetPosition(AstroObject planet, double jdtt)
     {
         // Get the VSOP87D data for the planet from the database.
         // These aren't included in Load() so I may need to get them separately
         // rather than via the VSOP87DRecords property.
-        using AstroDbContext db = new ();
-        var records = db.VSOP87DRecords
+        var records = astroDbContext.VSOP87DRecords
             .Where(r => r.AstroObjectId == planet.Id)
             .ToList();
 

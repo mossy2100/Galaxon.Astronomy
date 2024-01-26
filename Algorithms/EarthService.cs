@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
+using Galaxon.Core.Exceptions;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
@@ -19,24 +20,19 @@ namespace Galaxon.Astronomy.Algorithms;
 /// - International Atomic Time (TAI)
 /// Differences are calculated in SI seconds in all cases.
 /// </summary>
-public class EarthService
+public class EarthService(AstroObjectRepository astroObjectRepository, PlanetService planetService)
 {
-    private AstroObjectRepository _repo;
-
     private AstroObject? _earth;
-
-    public EarthService(AstroObjectRepository repo)
-    {
-        _repo = repo;
-    }
 
     public AstroObject GetPlanet()
     {
         if (_earth == null)
         {
-            // TODO make this call async
-            _earth = _repo.Load("Earth");
+            AstroObject? earth = astroObjectRepository.Load("Earth", "planet");
+            _earth = earth
+                ?? throw new DataNotFoundException("Could not find planet Earth in the database.");
         }
+
         return _earth;
     }
 
@@ -67,6 +63,6 @@ public class EarthService
     public (double L, double B, double R) CalcPosition(double jdtt)
     {
         AstroObject earth = GetPlanet();
-        return PlanetService.CalcPlanetPosition(earth, jdtt);
+        return planetService.CalcPlanetPosition(earth, jdtt);
     }
 }

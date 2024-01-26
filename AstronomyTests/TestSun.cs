@@ -7,19 +7,32 @@ namespace Galaxon.Astronomy.Tests;
 [TestClass]
 public class TestSun
 {
+    private AstroDbContext? _astroDbContext;
+
+    private AstroObjectRepository? _astroObjectRepository;
+
+    private EarthService? _earthService;
+
+    private PlanetService? _planetService;
+
+    private SunService? _sunService;
+
+    [TestInitialize]
+    public void Init()
+    {
+        _astroDbContext = new AstroDbContext();
+        _astroObjectRepository = new AstroObjectRepository(_astroDbContext);
+        _planetService = new PlanetService(_astroDbContext);
+        _earthService = new EarthService(_astroObjectRepository, _planetService);
+        _sunService = new SunService(_astroDbContext, _astroObjectRepository, _earthService,
+            _planetService);
+    }
+
     [TestMethod]
     public void CalcPositionTest()
     {
-        // Construct services.
-        using AstroDbContext astroDbContext = new ();
-        AstroObjectRepository astroObjectRepository = new (astroDbContext);
-        EarthService earthService = new (astroObjectRepository);
-        TimeScaleService timeScaleService = new ();
-        SunService sunService = new (astroDbContext, astroObjectRepository, earthService,
-            timeScaleService);
-
         double jdtt = 2448908.5;
-        (double actualL, double actualB) = sunService.CalcPosition(jdtt);
+        (double actualL, double actualB) = _sunService!.CalcPosition(jdtt);
 
         double expectedL = Angle.NormalizeRadians(Angle.DmsToRad(199, 54, 21.82));
         double expectedB = Angle.NormalizeRadians(Angle.DmsToRad(0, 0, 0.62));

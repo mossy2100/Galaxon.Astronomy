@@ -1,34 +1,30 @@
 ﻿using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
+using Galaxon.Core.Exceptions;
 
 namespace Galaxon.Astronomy.Algorithms;
 
 /// <summary>
 /// A container for constants and static methods related to Mars.
 /// </summary>
-public class MarsService
+public class MarsService(AstroObjectRepository astroObjectRepository, PlanetService planetService)
 {
-    private AstroObjectRepository _repo;
-
-    private AstroObject? _mars;
-
     /// <summary>
     /// Number of days (Earth solar days) per sol (Mars solar day).
     /// </summary>
     public const double DAYS_PER_SOL = 1.02749;
 
-    public MarsService(AstroObjectRepository repo)
-    {
-        _repo = repo;
-    }
+    private AstroObject? _mars;
 
     public AstroObject GetPlanet()
     {
         if (_mars == null)
         {
-            // TODO make this call async
-            _mars = _repo.Load("Mars");
+            AstroObject? mars = astroObjectRepository.Load("Mars", "planet");
+            _mars = mars
+                ?? throw new DataNotFoundException("Could not find planet Mars in the database.");
         }
+
         return _mars;
     }
 
@@ -40,6 +36,6 @@ public class MarsService
     public (double L, double B, double R) CalcPosition(double jdtt)
     {
         AstroObject mars = GetPlanet();
-        return PlanetService.CalcPlanetPosition(mars, jdtt);
+        return planetService.CalcPlanetPosition(mars, jdtt);
     }
 }

@@ -1,34 +1,30 @@
 using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Enums;
 using Galaxon.Astronomy.Models;
+using Galaxon.Core.Exceptions;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 
 namespace Galaxon.Astronomy.Algorithms;
 
-public class MoonService
+public class MoonService(AstroObjectRepository astroObjectRepository)
 {
-    private AstroObjectRepository _repo;
+    public static DateTime LUNATION_0_START { get; } =
+        new (2000, 1, 6, 18, 14, 0, DateTimeKind.Utc);
 
     private AstroObject? _moon;
-
-    public MoonService(AstroObjectRepository repo)
-    {
-        _repo = repo;
-    }
 
     public AstroObject GetPlanet()
     {
         if (_moon == null)
         {
-            // TODO make this call async
-            _moon = _repo.Load("Moon");
+            AstroObject? moon = astroObjectRepository.Load("Moon", "planet");
+            _moon = moon
+                ?? throw new DataNotFoundException("Could not find planet Moon in the database.");
         }
+
         return _moon;
     }
-
-    public static DateTime LUNATION_0_START { get; } =
-        new (2000, 1, 6, 18, 14, 0, DateTimeKind.Utc);
 
     /// <summary>
     /// Find the DateTime (UTC) of the next specified lunar phase on or after the given DateTime.
@@ -40,7 +36,7 @@ public class MoonService
     /// A LunarPhase object, which contains information about which phase it is, and the approximate
     /// datetime of the event.
     /// </returns>
-    public static LunarPhase PhaseFromDateTime(DateTime dt)
+    public LunarPhase PhaseFromDateTime(DateTime dt)
     {
         // Calculate k, rounded off to nearest 0.25.
         double k = (dt - LUNATION_0_START).Ticks / XTimeSpan.TICKS_PER_LUNATION;
@@ -220,7 +216,7 @@ public class MoonService
     /// <param name="start">The start of the period.</param>
     /// <param name="end">The end of the period.</param>
     /// <returns></returns>
-    public static List<LunarPhase> PhasesInPeriod(DateTime start, DateTime end)
+    public List<LunarPhase> PhasesInPeriod(DateTime start, DateTime end)
     {
         List<LunarPhase> result = [];
 
@@ -263,7 +259,7 @@ public class MoonService
     /// </summary>
     /// <param name="year">The year number.</param>
     /// <returns></returns>
-    public static List<LunarPhase> PhasesInYear(int year)
+    public List<LunarPhase> PhasesInYear(int year)
     {
         // Check year is valid. Valid range matches DateTime.IsLeapYear().
         if (year is < 1 or > 9999)

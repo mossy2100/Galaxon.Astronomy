@@ -10,6 +10,20 @@ namespace Galaxon.Astronomy.Tests;
 [TestClass]
 public class TestPlanets
 {
+    private AstroDbContext? _astroDbContext;
+
+    private AstroObjectRepository? _astroObjectRepository;
+
+    private PlanetService? _planetService;
+
+    [TestInitialize]
+    public void Init()
+    {
+        _astroDbContext = new AstroDbContext();
+        _astroObjectRepository = new AstroObjectRepository(_astroDbContext);
+        _planetService = new PlanetService(_astroDbContext);
+    }
+
     /// <summary>
     /// Test the example given in Wikipedia.
     /// <see href="https://en.wikipedia.org/wiki/Sidereal_time#ERA"/>
@@ -31,9 +45,7 @@ public class TestPlanets
     public void TestCalcPositionVenus()
     {
         // Arrange.
-        using AstroDbContext astroDbContext = new ();
-        AstroObjectRepository astroObjectRepository = new (astroDbContext);
-        AstroObject? venus = astroObjectRepository.Load("Venus");
+        AstroObject? venus = _astroObjectRepository!.Load("Venus");
         if (venus == null)
         {
             Assert.Fail("Could not find Venus in the database.");
@@ -46,7 +58,7 @@ public class TestPlanets
 
         // Act.
         (double actualL, double actualB, double actualR) =
-            PlanetService.CalcPlanetPosition(venus, 2_448_976.5);
+            _planetService!.CalcPlanetPosition(venus, 2_448_976.5);
 
         // Assert.
         // I assume larger delta values are needed here because Meeus uses a
@@ -76,7 +88,7 @@ public class TestPlanets
         double jdtt = dttt.ToJulianDate();
 
         // Act.
-        (double actualL, double B, double R) = PlanetService.CalcPlanetPosition(saturn, jdtt);
+        (double actualL, double B, double R) = _planetService!.CalcPlanetPosition(saturn, jdtt);
 
         // Assert.
         double expectedL = Angle.DegToRad(39.972_3901);
