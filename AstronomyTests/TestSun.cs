@@ -1,4 +1,5 @@
-using Galaxon.Astronomy.Worlds;
+using Galaxon.Astronomy.Database;
+using Galaxon.Astronomy.Services;
 using Galaxon.Numerics.Geometry;
 
 namespace Galaxon.Astronomy.Tests;
@@ -9,8 +10,16 @@ public class TestSun
     [TestMethod]
     public void CalcPositionTest()
     {
-        var jdtt = 2448908.5;
-        (double actualL, double actualB) = SunService.CalcPosition(jdtt);
+        // Construct services.
+        using AstroDbContext astroDbContext = new ();
+        AstroObjectRepository astroObjectRepository = new (astroDbContext);
+        EarthService earthService = new (astroObjectRepository);
+        TimeScaleService timeScaleService = new ();
+        SunService sunService = new (astroDbContext, astroObjectRepository, earthService,
+            timeScaleService);
+
+        double jdtt = 2448908.5;
+        (double actualL, double actualB) = sunService.CalcPosition(jdtt);
 
         double expectedL = Angle.NormalizeRadians(Angle.DmsToRad(199, 54, 21.82));
         double expectedB = Angle.NormalizeRadians(Angle.DmsToRad(0, 0, 0.62));

@@ -1,7 +1,7 @@
 using System.Globalization;
 using Galaxon.Astronomy.Enums;
 using Galaxon.Astronomy.Models;
-using Galaxon.Astronomy.Worlds;
+using Galaxon.Astronomy.Services;
 using Newtonsoft.Json;
 
 namespace Galaxon.Astronomy.Tests;

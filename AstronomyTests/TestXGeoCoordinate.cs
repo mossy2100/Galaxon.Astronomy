@@ -1,6 +1,6 @@
 ﻿using Galaxon.Astronomy.Database;
 using Galaxon.Astronomy.Models;
-using Galaxon.Astronomy.Worlds;
+using Galaxon.Astronomy.Services;
 using Galaxon.Numerics.Geometry;
 using GeoCoordinatePortable;
 
@@ -13,8 +13,9 @@ public class TestCoordinates
     public void TestShortestDistance()
     {
         // Calculate distance in metres.
-        using AstroDbContext db = new ();
-        var earth = Planet.Load(db, "Earth");
+        using AstroDbContext astroDbContext = new ();
+        AstroObjectRepository astroObjectRepository = new (astroDbContext);
+        AstroObject? earth = astroObjectRepository.Load("Earth");
 
         if (earth == null)
         {
@@ -33,7 +34,7 @@ public class TestCoordinates
         GeoCoordinate washington = new (lat2, long2);
 
         // Calculate distance in metres.
-        double dist = DistanceCalculationService.ShortestDistanceBetween(paris, washington, earth);
+        double dist = DistanceService.ShortestDistanceBetween(paris, washington, earth);
 
         // Assert.
         // Check it's correct within 5 metres (in the book he's rounded it

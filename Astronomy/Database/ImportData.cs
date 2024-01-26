@@ -2,6 +2,7 @@ using System.Globalization;
 using CsvHelper;
 using Galaxon.Astronomy.Enums;
 using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Services;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Strings;
 using Galaxon.Core.Time;
@@ -363,10 +364,9 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
                 continue;
             }
 
-            AstroObject planet;
-            List<AstroObject> planets = astroObjectRepository.LoadMany(name, "planet");
+            AstroObject? planet = astroObjectRepository.Load(name, "planet");
 
-            if (planets.Count == 0)
+            if (planet == null)
             {
                 // Create a new planet in the database.
                 Console.WriteLine($"Adding new planet {name}.");
@@ -377,7 +377,6 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
             {
                 // Update planet in the database.
                 Console.WriteLine($"Updating planet {name}.");
-                planet = planets.First();
                 db.AstroObjects.Attach(planet);
             }
 
@@ -577,7 +576,7 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
     /// <see href="https://www.caglow.com/info/compute/vsop87"/>
     /// </summary>
     /// <param name="fileName">The name of the data file.</param>
-    public static void ParseVSOP87DataFile(string fileName)
+    public void ParseVSOP87DataFile(string fileName)
     {
         using AstroDbContext db = new ();
 
@@ -594,7 +593,7 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
                 Console.WriteLine("Could not read planet number, skipping line.");
                 continue;
             }
-            Planet? planet = db.Planets.FirstOrDefault(p => p.Number == planetNum);
+            AstroObject? planet = astroObjectRepository.Load(planetNum, "planet");
             if (planet == null)
             {
                 Console.WriteLine($"Could not find planet number {planetNum}.");
@@ -697,33 +696,35 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
         }
     }
 
-    public static void ParseAllVSOP87DataFiles()
+    public void ParseAllVSOP87DataFiles()
     {
         for (byte planetNum = 1; planetNum <= 8; planetNum++)
         {
-            string name = Planet.NumberToName(planetNum);
+            string name = PlanetService.PlanetNumberToName(planetNum);
             string abbrev = name[..3].ToLower();
             ParseVSOP87DataFile($"VSOP87D.{abbrev}");
         }
     }
 
-    public static void SetAstroObjectIds()
+    public void SetAstroObjectIds()
     {
-        using AstroDbContext db = new ();
-
         // Get the planet ids.
+        List<AstroObject> planets = astroObjectRepository.LoadAllInGroup("planet");
         Dictionary<string, int> planetIds = new ();
-        foreach (Planet? planet in db.Planets)
+        foreach (AstroObject planet in planets)
         {
-            planetIds[planet.Name ?? ""] = planet?.Id ?? 0;
+            if (planet.Name != null)
+            {
+                planetIds[planet.Name] = planet.Id;
+            }
         }
 
         // Update the VSOP87D records.
-        foreach (VSOP87DRecord vsop87Rec in db.VSOP87DRecords)
+        foreach (VSOP87DRecord vsop87Rec in astroDbContext.VSOP87DRecords)
         {
             vsop87Rec.AstroObjectId = planetIds[vsop87Rec.PlanetName];
         }
 
-        db.SaveChanges();
+        astroDbContext.SaveChanges();
     }
 }

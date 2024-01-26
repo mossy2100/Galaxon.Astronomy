@@ -1,6 +1,6 @@
 ﻿using Galaxon.Astronomy.Database;
 using Galaxon.Astronomy.Models;
-using Galaxon.Astronomy.Worlds;
+using Galaxon.Astronomy.Services;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 using Galaxon.Quantities;
@@ -31,8 +31,9 @@ public class TestPlanets
     public void TestCalcPositionVenus()
     {
         // Arrange.
-        using AstroDbContext db = new ();
-        var venus = Planet.Load(db, "Venus");
+        using AstroDbContext astroDbContext = new ();
+        AstroObjectRepository astroObjectRepository = new (astroDbContext);
+        AstroObject? venus = astroObjectRepository.Load("Venus");
         if (venus == null)
         {
             Assert.Fail("Could not find Venus in the database.");
@@ -45,7 +46,7 @@ public class TestPlanets
 
         // Act.
         (double actualL, double actualB, double actualR) =
-            DistanceCalculationService.CalcPlanetPosition(venus, 2_448_976.5);
+            PlanetService.CalcPlanetPosition(venus, 2_448_976.5);
 
         // Assert.
         // I assume larger delta values are needed here because Meeus uses a
@@ -63,8 +64,9 @@ public class TestPlanets
     public void TestCalcPositionSaturn()
     {
         // Arrange.
-        using AstroDbContext db = new ();
-        var saturn = Planet.Load(db, "Saturn");
+        using AstroDbContext astroDbContext = new ();
+        AstroObjectRepository astroObjectRepository = new (astroDbContext);
+        AstroObject? saturn = astroObjectRepository.Load("Saturn");
         if (saturn == null)
         {
             Assert.Fail("Could not find Saturn in the database.");
@@ -74,7 +76,7 @@ public class TestPlanets
         double jdtt = dttt.ToJulianDate();
 
         // Act.
-        (double actualL, double B, double R) = DistanceCalculationService.CalcPlanetPosition(saturn, jdtt);
+        (double actualL, double B, double R) = PlanetService.CalcPlanetPosition(saturn, jdtt);
 
         // Assert.
         double expectedL = Angle.DegToRad(39.972_3901);

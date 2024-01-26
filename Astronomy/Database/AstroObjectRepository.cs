@@ -6,8 +6,7 @@ namespace Galaxon.Astronomy.Database;
 public class AstroObjectRepository(AstroDbContext dbContext)
 {
     /// <summary>
-    /// Load an AstroObject from the database by specifying an object name or number, and optional
-    /// group name.
+    /// Load an AstroObject from the database by specifying an object name and optional group name.
     /// Examples:
     ///     Load("Earth");
     ///     Load("Ceres", "dwarf planet");
@@ -40,6 +39,40 @@ public class AstroObjectRepository(AstroDbContext dbContext)
         }
 
         return results.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Load an AstroObject from the database by specifying an object number and optional group name.
+    /// Examples:
+    ///     Load(2, "planet");
+    ///     Load(134340);
+    /// If there is more than one matching result, throw an exception.
+    /// </summary>
+    /// <param name="searchNumber">The object's number.</param>
+    /// <param name="groupName">The name of the group to search, e.g. "planet", "asteroid", etc.</param>
+    /// <returns>The matching AstroObject.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// If the object name is null or whitespace.
+    /// </exception>
+    public AstroObject? Load(int searchNumber, string? groupName = null)
+    {
+        return Load(searchNumber.ToString(), groupName);
+    }
+    /// <summary>
+    /// Load all AstroObjects in a group.
+    /// Examples:
+    ///     LoadAllInGroup("planet");
+    /// </summary>
+    /// <param name="groupName">The name of the group, e.g. "planet", "asteroid", "plutoid", etc.</param>
+    /// <returns>The matching AstroObjects.</returns>
+    public List<AstroObject> LoadAllInGroup(string groupName)
+    {
+        // Get matching objects.
+        IQueryable<AstroObject> results = from ao in dbContext.AstroObjects
+            where ao.IsInGroup(groupName)
+            select ao;
+
+        return results.ToList();
     }
 
     /// <summary>
