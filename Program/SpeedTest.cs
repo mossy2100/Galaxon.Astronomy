@@ -2,12 +2,12 @@
 
 namespace Galaxon.Astronomy;
 
-public delegate double ToJulianDay(DateTime dt);
+public delegate double ToJulianDate(DateTime dt);
 
 public class SpeedTest
 {
-    protected static List<double> DateTimeToJulianDayMethod(string methodName,
-        ToJulianDay tjd, List<DateTime> dateTimes)
+    protected static List<double> DateTimeToJulianDateMethod(string methodName,
+        ToJulianDate tjd, List<DateTime> dateTimes)
     {
         Stopwatch sw = new ();
 
@@ -27,8 +27,8 @@ public class SpeedTest
     }
 
     /*
-    // Test the ToJulianDay() methods.
-    public static void DateTimeToJulianDayMethods()
+    // Test the ToJulianDate() methods.
+    public static void DateTimeToJulianDateMethods()
     {
         Random rnd = new();
         GregorianCalendar gc = new();
@@ -49,10 +49,10 @@ public class SpeedTest
         }
 
         // Run speed tests.
-        List<double> results1 = DateTimeToJulianDayMethod("ToJulianDay1", DateTimeExtensions.ToJulianDay1, dateTimes);
-        List<double> results2 = DateTimeToJulianDayMethod("ToJulianDay2", DateTimeExtensions.ToJulianDay2, dateTimes);
-        List<double> results3 = DateTimeToJulianDayMethod("ToJulianDay3", DateTimeExtensions.ToJulianDay3, dateTimes);
-        List<double> results4 = DateTimeToJulianDayMethod("ToJulianDay4", DateTimeExtensions.ToJulianDay4, dateTimes);
+        List<double> results1 = DateTimeToJulianDateMethod("ToJulianDate1", DateTimeExtensions.ToJulianDate1, dateTimes);
+        List<double> results2 = DateTimeToJulianDateMethod("ToJulianDate2", DateTimeExtensions.ToJulianDate2, dateTimes);
+        List<double> results3 = DateTimeToJulianDateMethod("ToJulianDate3", DateTimeExtensions.ToJulianDate3, dateTimes);
+        List<double> results4 = DateTimeToJulianDateMethod("ToJulianDate4", DateTimeExtensions.ToJulianDate4, dateTimes);
 
         for (int i = 0; i < dateTimes.Count; i++)
         {

@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{B4E95EA5-6BD5-4792-BC56-ABFF4E08B610}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstronomyTests", "AstronomyTests\AstronomyTests.csproj", "{BD46CD7B-691F-4CBB-9F4D-21840E4F55AD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Program", "Program\Program.csproj", "{C9C8B06B-1F59-4975-AFE1-766AE0528702}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithms", "Algorithms\Algorithms.csproj", "{D66EDA98-F2AD-4E77-892E-4775E3CBE074}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Astronomy", "Astronomy\Astronomy.csproj", "{D66EDA98-F2AD-4E77-892E-4775E3CBE074}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOFA", "SOFA\SOFA.csproj", "{B69A71D3-ACBE-43BE-9619-57001158AE8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{1CB8FEDE-4792-476D-AA0E-862521027BD3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +16,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B4E95EA5-6BD5-4792-BC56-ABFF4E08B610}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B4E95EA5-6BD5-4792-BC56-ABFF4E08B610}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B4E95EA5-6BD5-4792-BC56-ABFF4E08B610}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B4E95EA5-6BD5-4792-BC56-ABFF4E08B610}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BD46CD7B-691F-4CBB-9F4D-21840E4F55AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BD46CD7B-691F-4CBB-9F4D-21840E4F55AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD46CD7B-691F-4CBB-9F4D-21840E4F55AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -44,5 +40,9 @@ Global
 		{B69A71D3-ACBE-43BE-9619-57001158AE8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B69A71D3-ACBE-43BE-9619-57001158AE8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B69A71D3-ACBE-43BE-9619-57001158AE8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CB8FEDE-4792-476D-AA0E-862521027BD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CB8FEDE-4792-476D-AA0E-862521027BD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CB8FEDE-4792-476D-AA0E-862521027BD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CB8FEDE-4792-476D-AA0E-862521027BD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

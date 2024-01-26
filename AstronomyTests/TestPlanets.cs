@@ -1,4 +1,7 @@
-﻿using Galaxon.Core.Time;
+﻿using Galaxon.Astronomy.Database;
+using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Worlds;
+using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 using Galaxon.Quantities;
 
@@ -16,7 +19,7 @@ public class TestPlanets
     {
         DateTime dt = new (2017, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         double expected = Angle.DmsToRad(100, 37, 12.4365);
-        double actual = Terran.CalcERA(dt);
+        double actual = EarthService.CalcERA(dt);
         double delta = Angle.DmsToRad(0, 0, 1e-3);
         Assert.AreEqual(expected, actual, delta);
     }
@@ -42,7 +45,7 @@ public class TestPlanets
 
         // Act.
         (double actualL, double actualB, double actualR) =
-            World.CalcPlanetPosition(venus, 2_448_976.5);
+            DistanceCalculationService.CalcPlanetPosition(venus, 2_448_976.5);
 
         // Assert.
         // I assume larger delta values are needed here because Meeus uses a
@@ -68,10 +71,10 @@ public class TestPlanets
             return;
         }
         var dttt = new DateTime(1999, 7, 26, 0, 0, 0, DateTimeKind.Utc);
-        double jdtt = dttt.ToJulianDay();
+        double jdtt = dttt.ToJulianDate();
 
         // Act.
-        (double actualL, double B, double R) = World.CalcPlanetPosition(saturn, jdtt);
+        (double actualL, double B, double R) = DistanceCalculationService.CalcPlanetPosition(saturn, jdtt);
 
         // Assert.
         double expectedL = Angle.DegToRad(39.972_3901);
