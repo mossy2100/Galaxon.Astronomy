@@ -1,24 +1,13 @@
-﻿using System.Data;
-using Galaxon.Astronomy.Data;
+﻿using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
 using Galaxon.Core.Exceptions;
-using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 
 namespace Galaxon.Astronomy.Algorithms;
 
 /// <summary>
-/// This is a static class containing useful methods and constants relating to
-/// time.
-///
-/// This includes methods and constants for converting between time scales,
-/// including:
-/// - Terrestrial Time (TT)
-/// - Universal Time (UT1)
-/// - Coordinated Universal Time (UTC)
-/// - International Atomic Time (TAI)
-/// Differences are calculated in SI seconds in all cases.
+/// This is a static class containing useful methods and constants relating to Earth.
 /// </summary>
 public class EarthService(AstroObjectRepository astroObjectRepository, PlanetService planetService)
 {
@@ -41,11 +30,11 @@ public class EarthService(AstroObjectRepository astroObjectRepository, PlanetSer
     /// <see href="https://en.wikipedia.org/wiki/Sidereal_time#ERA"/>
     /// TODO This method probably belongs in a different class.
     /// </summary>
-    /// <param name="jdut">The Julian Date in UT1.</param>
+    /// <param name="jd">The Julian Date in UT1.</param>
     /// <returns>The Earth Rotation Angle.</returns>
-    public static double CalcERA(double jdut)
+    public static double CalcEarthRotationAngle(double jd)
     {
-        double t = TimeScaleService.JulianDaysSinceJ2000(jdut);
+        double t = TimeScaleService.JulianDaysSinceJ2000(jd);
         double radians = Tau * (0.779_057_273_264 + 1.002_737_811_911_354_48 * t);
         return Angle.NormalizeRadians(radians);
     }
@@ -53,13 +42,18 @@ public class EarthService(AstroObjectRepository astroObjectRepository, PlanetSer
     /// <summary>
     /// Overload of CalcERA() that accepts a UTC DateTime.
     /// </summary>
-    /// <param name="dtut">The instant.</param>
+    /// <param name="dt">The instant.</param>
     /// <returns>The ERA at the given instant.</returns>
-    public static double CalcERA(DateTime dtut)
+    public static double CalcEarthRotationAngle(DateTime dt)
     {
-        return CalcERA(dtut.ToJulianDate());
+        return CalcEarthRotationAngle(dt.ToJulianDate());
     }
 
+    /// <summary>
+    /// Calculate the heliocentric position of Earth at a given point in time.
+    /// </summary>
+    /// <param name="jdtt">The Julian Date in Terrestrial Time.</param>
+    /// <returns>Heliocentric coordinates of Earth.</returns>
     public (double L, double B, double R) CalcPosition(double jdtt)
     {
         AstroObject earth = GetPlanet();

@@ -1,15 +1,11 @@
-using System.Data;
-using System.Globalization;
-using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Models;
 using Galaxon.Core.Exceptions;
-using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Algebra;
 
 namespace Galaxon.Astronomy.Algorithms;
 
-public class TimeScaleService
+public static class TimeScaleService
 {
     /// <summary>
     /// Number of seconds difference between TAI and TT.
@@ -35,75 +31,119 @@ public class TimeScaleService
         new (2000, 1, 1, 11, 58, 55, 816, DateTimeKind.Utc);
 
     /// <summary>
-    /// Converts a Gregorian DateTime into a single value representing the year with a fractional
+    /// Converts a Gregorian date into a single value representing the year with a fractional
     /// part indicating position in the year.
     /// </summary>
-    /// <param name="dt">The datetime.</param>
+    /// <param name="year">The year.</param>
+    /// <param name="month">The month (optional).</param>
+    /// <param name="day">The day of the month (optional).</param>
     /// <returns>The year as a double.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If the year, month, or day
     /// is invalid.</exception>
-    public static double CalcDecimalYear(DateTime dt)
+    public static double CalcDecimalYear(int year, int month = 0, int day = 0)
     {
-        // Calculate fraction of year.
-        GregorianCalendar gc = new ();
-        double fracYear = (dt.DayOfYear - 1.0) / gc.GetDaysInYear(dt.Year);
+        // Check month is in range.
+        if (month is < 0 or > 12)
+        {
+            throw new ArgumentOutOfRangeException(nameof(month), "Must be in the range 0-12.");
+        }
+
+        // Get the fractional part of the year.
+        double frac;
+
+        if (month == 0)
+        {
+            // Check the day is also 0.
+            if (day != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(day),
+                    "If the month is 0, then the day of the month should also be 0.");
+            }
+
+            // Assume the intention is to find delta-T for the start of the year.
+            frac = 0;
+        }
+        else if (day == 0)
+        {
+            // If the day is not set, assume middle of month.
+            // <see href="https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html"/>
+            frac = (month - 0.5) / 12;
+        }
+        else
+        {
+            // Check day is in range. I'm using my own XGregorianCalendar class instead of the .NET
+            // GregorianCalendar class because it supports negative years.
+            int daysInMonth = XGregorianCalendar.DaysInMonth(year, month);
+            if (day < 1 || day > daysInMonth)
+            {
+                throw new ArgumentOutOfRangeException(nameof(day),
+                    $"Must be in the range 0-{daysInMonth}.");
+            }
+
+            // Assume the midpoint of the specified date (i.e. noon).
+            var d = new DateOnly(year, month, day);
+            frac = (d.DayOfYear - 0.5) / XGregorianCalendar.DaysInYear(d.Year);
+        }
 
         // Calculate result.
-        return dt.Year + fracYear + dt.TimeOfDay.TotalDays;
+        return year + frac;
     }
 
     /// <summary>
-    /// Calculate ∆T in seconds for a given year, month, or date using NASA's
-    /// equations.
-    /// If only the year is provided, ∆T at the start of the year is
+    /// Get a datetime as a decimal year.
+    /// </summary>
+    /// <param name="dt"></param>
+    /// <returns></returns>
+    public static double CalcDecimalYear(DateTime dt)
+    {
+        long secondsInYear = XGregorianCalendar.DaysInYear(dt.Year) * XTimeSpan.SECONDS_PER_DAY;
+        long seconds = (dt.DayOfYear - 1) * XTimeSpan.SECONDS_PER_DAY + dt.TimeOfDay.Seconds;
+        return dt.Year + (double)seconds / secondsInYear;
+    }
+
+    /// <summary>
+    /// Calculate ∆T in seconds for a given year, month, or date using NASA's equations.
+    /// If only the year is provided, ∆T at the start of the year is calculated.
+    /// If the year and month are provided but no day, then ∆T for the start of the month is
     /// calculated.
-    /// If the year and month are provided but no day, then ∆T for the start of
-    /// the month is calculated.
-    /// If the year, month, and day are provided, then ∆T for the start of
-    /// that date is calculated.
-    /// ∆T is the difference between Terrestrial Time (TT; formerly known as
-    /// Terrestrial Dynamical Time, TDT, or Dynamical Time, TD) and Universal
-    /// Time (UT1; also commonly referred to simply as UT).
+    /// If the year, month, and day are provided, then ∆T for the start of that date is calculated.
+    /// ∆T is the difference between Terrestrial Time (TT; formerly known as Terrestrial Dynamical
+    /// Time, TDT, or Dynamical Time, TD) and Universal Time (UT1; also commonly referred to simply
+    /// as UT).
     /// Thus: ∆T = TT - UT1
     /// Equations in this method were copied from:
     /// <see href="https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html"/>
-    /// These are intended to be a simpler method for calculating ∆T than using
-    /// tables as in Meeus AA2 and other sources.
-    /// Estimates of ∆T are assumed to be reasonably accurate in the range
-    /// 1620..2100, but since ∆T varies unpredictably, uncertainty in ∆T
-    /// increases outside of this range.
+    /// These are intended to be a simpler method for calculating ∆T than using tables as in Meeus
+    /// AA2 and other sources. Estimates of ∆T are assumed to be reasonably accurate in the range
+    /// 1620..2100, but since ∆T varies unpredictably, uncertainty in ∆T increases outside of this
+    /// range.
     /// <see href="https://eclipse.gsfc.nasa.gov/SEcat5/uncertainty.html"/>
     /// <see href="https://maia.usno.navy.mil/products/deltaT"/>
     /// <see href="https://asa.hmnao.com/SecK/DeltaT.html"/>
     /// <see href="https://www.hermetic.ch/cal_stud/meeus1.htm"/>
     /// </summary>
-    /// <param name="year">The year.</param>
-    /// <param name="month">The month. Defaults to 1.</param>
-    /// <param name="day">The day of the month. Defaults to 1.</param>
+    /// <param name="y">The year as a decimal value.</param>
     /// <returns>The calculated value for ∆T.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">If the year, month, or day
-    /// is invalid.</exception>
-    public static double CalcDeltaT(int year, int month = 1, int day = 1)
+    public static double CalcDeltaTNASA(double y)
     {
         double u, deltaT;
 
-        // Get the year as a double.
-        // This will throw an exception if the year, month, or day is invalid.
-        double y = CalcDecimalYear(new DateTime(year, month, day));
+        // Get the year as an integer.
+        int year = (int)Floor(y);
 
         // Calculate deltaT.
         switch (year)
         {
             case < -500:
-                u = (y - 1820) / 100;
-                deltaT = -20 + 32 * u * u;
+            case > 2150:
+                deltaT = Polynomials.EvaluatePolynomial([
+                    -20,
+                    0,
+                    32
+                ], (y - 1820) / 100);
                 break;
 
-            case -500:
-                deltaT = 17203.7;
-                break;
-
-            case > -500 and <= 500:
+            case >= -500 and <= 500:
                 deltaT = Polynomials.EvaluatePolynomial([
                     10583.6,
                     -1014.41,
@@ -241,15 +281,9 @@ public class TimeScaleService
                 u = (y - 1820) / 100;
                 deltaT = -20 + 32 * u * u - 0.5628 * (2150 - y);
                 break;
-
-            case > 2150:
-                u = (y - 1820) / 100;
-                deltaT = -20 + 32 * u * u;
-                break;
         }
 
-        // Apply the lunar ephemeris correction for years outside the range
-        // 1955..2005.
+        // Apply the lunar ephemeris correction for years outside the range 1955..2005.
         if (year is < 1955 or > 2005)
         {
             double t = y - 1955;
@@ -260,40 +294,35 @@ public class TimeScaleService
     }
 
     /// <summary>
-    /// Calculate ∆T for a given year, month, or date using the method from
-    /// Astronomical Algorithms 2nd ed. (AA2) by Jean Meeus, pp77-80.
-    /// This pretty closely tracks the NASA values for the range given in the
-    /// table (1620-1998) but diverges significantly before and after that.
-    /// I implemented this algorithm to compare the two, but I expect the NASA
-    /// version is superior.
+    /// Calculate ∆T for a given year, month, or date using the method from Astronomical Algorithms
+    /// 2nd ed. (AA2) by Jean Meeus, pp77-80.
+    /// This pretty closely tracks the NASA values for the range given in the table (1620-1998) but
+    /// diverges significantly before and after that. I implemented this algorithm to compare the
+    /// two, but I expect the NASA version is superior.
     /// </summary>
-    /// <param name="year">The year.</param>
-    /// <param name="month">The month. Defaults to 1.</param>
-    /// <param name="day">The day of the month. Defaults to 1.</param>
+    /// <param name="y">The year as a floating point value.</param>
     /// <returns>The calculated value for ∆T.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">If the year, month, or day is invalid.</exception>
-    /// <exception cref="DataException">If a ∆T entry expected to be found in
-    /// the database table could not be found.</exception>
-    public static double CalcDeltaTMeeus(int year, int month = 1, int day = 1)
+    /// <exception cref="DataNotFoundException">
+    /// If a ∆T entry expected to be found in the database table could not be found.
+    /// </exception>
+    public static double CalcDeltaTMeeus(double y)
     {
-        // Get the year as a double.
-        double y = TimeScaleService.CalcDecimalYear(new DateTime(year, month, day));
-
-        using AstroDbContext db = new ();
+        // Get the year as an int.
+        int year = (int)Floor(y);
 
         // Calculate deltaT.
         double deltaT;
-        double t = (y - 2000) / 100.0;
+        double t = (y - 2000.0) / 100.0;
 
         switch (year)
         {
             case < 948:
-                deltaT = 2177 + 497 * t + 44.1 * t * t;
+                deltaT = Polynomials.EvaluatePolynomial([2177, 497, 44.1], t);
                 break;
 
             case >= 948 and < 1620:
             case >= 2000:
-                deltaT = 102 + 102 * t + 25.3 * t * t;
+                deltaT = Polynomials.EvaluatePolynomial([102, 102, 25.3], t);
                 if (y is >= 2000 and <= 2100)
                 {
                     deltaT += 0.37 * (y - 2100);
@@ -301,28 +330,13 @@ public class TimeScaleService
                 break;
 
             case >= 1620 and < 2000:
-                // Check if the value is an even integer.
-                var y1 = (int)(Floor(y / 2) * 2);
-                if (y.FuzzyEquals(y1))
-                {
-                    // Get this entry from the database.
-                    DeltaTRecord? deltaTEntry =
-                        db.DeltaTRecords.FirstOrDefault(entry => entry.Year == y1);
-                    if (deltaTEntry == null)
-                    {
-                        throw new DataNotFoundException(
-                            $"Could not find delta-T entry for year {y1} in the database.");
-                    }
-                    deltaT = deltaTEntry.DeltaT;
-                }
-                else
-                {
-                    // Interpolate.
-                    // Get the deltaT values for the even-numbered years below and above y.
-                    double deltaT1 = CalcDeltaTMeeus(y1);
-                    double deltaT2 = CalcDeltaTMeeus(y1 + 2);
-                    deltaT = (y - y1) / 2 * (deltaT2 - deltaT1) + deltaT1;
-                }
+                // Get the value from the lookup table for the even years before and after, and
+                // interpolate.
+                int year1 = (int)(Floor(y / 2) * 2);
+                int year2 = year1 + 2;
+                double deltaT1 = DeltaTData[year1];
+                double deltaT2 = year2 == 2000 ? CalcDeltaTMeeus(year2) : DeltaTData[year2];
+                deltaT = deltaT1 + (deltaT2 - deltaT1) * (y - year1) / (year2 - year1);
                 break;
         }
 
@@ -330,20 +344,15 @@ public class TimeScaleService
     }
 
     /// <summary>
-    /// Calculate the value for ∆T in seconds at a given point in time.
-    /// Defaults to current DateTime.
+    /// Calculate the value for ∆T in seconds at a given Gregorian datetime.
+    /// Defaults to the current date.
     /// ∆T = TT - UT1
     /// </summary>
-    /// <param name="dt">A point in time. Defaults to current DateTime.</param>
+    /// <param name="dt">A date.</param>
     /// <returns></returns>
-    public static double CalcDeltaT(DateTime dt = new ())
+    public static double CalcDeltaTNASA(DateTime dt = new ())
     {
-        return CalcDeltaT(dt.Year, dt.Month, dt.Day);
-    }
-
-    public static double CalcDeltaT(double jd)
-    {
-        return CalcDeltaT(XDateTime.FromJulianDate(jd));
+        return CalcDeltaTNASA(CalcDecimalYear(dt));
     }
 
     /// <summary>
@@ -351,11 +360,13 @@ public class TimeScaleService
     /// Terrestrial Time (also known as the Julian Ephemeris Day, or JDE).
     /// ∆T = TT - UT  =>  TT = UT + ∆T
     /// </summary>
-    /// <param name="jdut">Julian Date in Universal Time</param>
+    /// <param name="jd">Julian Date in Universal Time</param>
     /// <returns>Julian Date in Terrestrial Time</returns>
-    public static double JulianDateUniversalToTerrestrial(double jdut)
+    public static double JulianDateUniversalToTerrestrial(double jd)
     {
-        return jdut + TimeSpan.FromSeconds(CalcDeltaT(jdut)).TotalDays;
+        DateTime dt = XDateTime.FromJulianDate(jd);
+        double deltaT = CalcDeltaTNASA(dt);
+        return jd + TimeSpan.FromSeconds(deltaT).TotalDays;
     }
 
     /// <summary>
@@ -367,14 +378,15 @@ public class TimeScaleService
     /// <returns>Julian Date in Universal Time</returns>
     public static double JulianDateTerrestrialToUniversal(double jdtt)
     {
-        // Calculate deltaT using TT, it should be virtually identical to UT.
-        double deltaT = CalcDeltaT(jdtt);
+        // Calculate deltaT using TT. It should be virtually identical to UT.
+        DateTime dt = XDateTime.FromJulianDate(jdtt);
+        double deltaT = CalcDeltaTNASA(dt);
         return jdtt - TimeSpan.FromSeconds(deltaT).TotalDays;
     }
 
-    public static double DateTimeToJulianDateTerrestrial(DateTime dtut)
+    public static double DateTimeToJulianDateTerrestrial(DateTime dt)
     {
-        return JulianDateUniversalToTerrestrial(dtut.ToJulianDate());
+        return JulianDateUniversalToTerrestrial(dt.ToJulianDate());
     }
 
     public static DateTime JulianDateTerrestrialToDateTime(double jdtt)
@@ -420,26 +432,23 @@ public class TimeScaleService
     /// <summary>
     /// Calculate the difference between UT1 and UTC in seconds.
     /// DUT1 = UT1 - UTC
-    /// In theory, this should always be between -0.9 and 0.9. However, because
-    /// the CalcDeltaT() algorithm is only approximate, it isn't.
-    /// DUT1 is normally measured in retrospect, not calculated. This
-    /// calculation has been included to check the accuracy of the CalcDeltaT()
-    /// method.
-    /// This calculation of DUT1 is only valid within the nominal range from
-    /// 1972..2010. Yet the *actual* DUT1 is within range up until 2022 (the
-    /// time of writing) because leap seconds have been added to produce exactly
-    /// this effect. The error must be in CalcDeltaT(), which leads me to
-    /// believe the NASA formulae used in this library either aren't super
+    /// In theory, this should always be between -0.9 and 0.9. However, because the CalcDeltaT()
+    /// algorithm is only approximate, it isn't.
+    /// DUT1 is normally measured in retrospect, not calculated. This calculation has been included
+    /// to check the accuracy of the CalcDeltaT() method.
+    /// This calculation of DUT1 is only valid within the nominal range from 1972..2010.
+    /// Yet the *actual* DUT1 is within range up until 2022 (the time of writing) because leap
+    /// seconds have been added to produce exactly this effect. The error must be in CalcDeltaT(),
+    /// which leads me to believe the NASA formulae used in this library either aren't super
     /// accurate or (more likely) they were developed before 2010.
     /// <see href="https://en.wikipedia.org/wiki/DUT1"/>
     /// </summary>
-    /// <param name="dt">A point in time. Defaults to current
-    /// DateTime.</param>
+    /// <param name="dt">A point in time. Defaults to current DateTime.</param>
     /// <returns>The difference between UT1 and UTC.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If year less than 1972.</exception>
     public static double CalcDUT1(DateTime dt = new ())
     {
-        return TT_MINUS_TAI - CalcDeltaT(dt) + CalcTAIMinusUTC(dt);
+        return TT_MINUS_TAI - CalcDeltaTNASA(dt) + CalcTAIMinusUTC(dt);
     }
 
     /// <summary>
@@ -482,27 +491,13 @@ public class TimeScaleService
         return JulianDaysSinceJ2000(jdtt) / XTimeSpan.DAYS_PER_JULIAN_MILLENNIUM;
     }
 
-    // The goal here is to generate a chart to show the difference between the 2 methods.
-    // Chart 1 would show the full range -1999..3000.
-    // Chart 2 would show the narrow (more accurate) range 1600..2100
-    // I will use a Syncfusion component for the chart, and add an ASP.NET Core project to display it.
-    public static void CompareDeltaTCalcs()
-    {
-        for (int y = -1999; y <= 3000; y++)
-        {
-            double deltaTNasa = CalcDeltaT(y);
-            double deltaTMeeus = TimeScaleService.CalcDeltaTMeeus(y);
-            double diff = Abs(deltaTMeeus - deltaTNasa);
-        }
-    }
-
     public static void TestCalcDUT1()
     {
         for (var y = 1972; y <= 2022; y++)
         {
             var dt = new DateTime(y, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             byte LSC = LeapSecondCount(dt);
-            double deltaT = CalcDeltaT(dt);
+            double deltaT = CalcDeltaTNASA(dt);
             double DUT1 = CalcDUT1(dt);
             Console.WriteLine($"Year={y}, LSC={LSC}, ∆T={deltaT}, DUT1={DUT1}");
             if (Abs(DUT1) > 0.9)
@@ -511,4 +506,49 @@ public class TimeScaleService
             }
         }
     }
+
+    /// <summary>
+    /// Copy of Table 10A in Astronomical Algorithms 2nd Ed. by Jean Meeus.
+    /// </summary>
+    private static readonly Dictionary<int, double> DeltaTData = new Dictionary<int, double>()
+    {
+        { 1620, 121.0 }, { 1622, 112.0 }, { 1624, 103.0 }, { 1626, 95.0 }, { 1628, 88.0 },
+        { 1630, 82.0 }, { 1632, 77.0 }, { 1634, 72.0 }, { 1636, 68.0 }, { 1638, 63.0 },
+        { 1640, 60.0 }, { 1642, 56.0 }, { 1644, 53.0 }, { 1646, 51.0 }, { 1648, 48.0 },
+        { 1650, 46.0 }, { 1652, 44.0 }, { 1654, 42.0 }, { 1656, 40.0 }, { 1658, 38.0 },
+        { 1660, 35.0 }, { 1662, 33.0 }, { 1664, 31.0 }, { 1666, 29.0 }, { 1668, 26.0 },
+        { 1670, 24.0 }, { 1672, 22.0 }, { 1674, 20.0 }, { 1676, 18.0 }, { 1678, 16.0 },
+        { 1680, 14.0 }, { 1682, 12.0 }, { 1684, 11.0 }, { 1686, 10.0 }, { 1688, 9.0 },
+        { 1690, 8.0 }, { 1692, 7.0 }, { 1694, 7.0 }, { 1696, 7.0 }, { 1698, 7.0 },
+        { 1700, 7.0 }, { 1702, 7.0 }, { 1704, 8.0 }, { 1706, 8.0 }, { 1708, 9.0 },
+        { 1710, 9.0 }, { 1712, 9.0 }, { 1714, 9.0 }, { 1716, 9.0 }, { 1718, 10.0 },
+        { 1720, 10.0 }, { 1722, 10.0 }, { 1724, 10.0 }, { 1726, 10.0 }, { 1728, 10.0 },
+        { 1730, 10.0 }, { 1732, 10.0 }, { 1734, 11.0 }, { 1736, 11.0 }, { 1738, 11.0 },
+        { 1740, 11.0 }, { 1742, 11.0 }, { 1744, 12.0 }, { 1746, 12.0 }, { 1748, 12.0 },
+        { 1750, 12.0 }, { 1752, 13.0 }, { 1754, 13.0 }, { 1756, 13.0 }, { 1758, 14.0 },
+        { 1760, 14.0 }, { 1762, 14.0 }, { 1764, 14.0 }, { 1766, 15.0 }, { 1768, 15.0 },
+        { 1770, 15.0 }, { 1772, 15.0 }, { 1774, 15.0 }, { 1776, 16.0 }, { 1778, 16.0 },
+        { 1780, 16.0 }, { 1782, 16.0 }, { 1784, 16.0 }, { 1786, 16.0 }, { 1788, 16.0 },
+        { 1790, 16.0 }, { 1792, 15.0 }, { 1794, 15.0 }, { 1796, 14.0 }, { 1798, 13.0 },
+        { 1800, 13.1 }, { 1802, 12.5 }, { 1804, 12.2 }, { 1806, 12.0 }, { 1808, 12.0 },
+        { 1810, 12.0 }, { 1812, 12.0 }, { 1814, 12.0 }, { 1816, 12.0 }, { 1818, 11.9 },
+        { 1820, 11.6 }, { 1822, 11.0 }, { 1824, 10.2 }, { 1826, 9.2 }, { 1828, 8.2 },
+        { 1830, 7.1 }, { 1832, 6.2 }, { 1834, 5.6 }, { 1836, 5.4 }, { 1838, 5.3 },
+        { 1840, 5.4 }, { 1842, 5.6 }, { 1844, 5.9 }, { 1846, 6.2 }, { 1848, 6.5 },
+        { 1850, 6.8 }, { 1852, 7.1 }, { 1854, 7.3 }, { 1856, 7.5 }, { 1858, 7.6 },
+        { 1860, 7.7 }, { 1862, 7.3 }, { 1864, 6.2 }, { 1866, 5.2 }, { 1868, 2.7 },
+        { 1870, 1.4 }, { 1872, -1.2 }, { 1874, -2.8 }, { 1876, -3.8 }, { 1878, -4.8 },
+        { 1880, -5.5 }, { 1882, -5.3 }, { 1884, -5.6 }, { 1886, -5.7 }, { 1888, -5.9 },
+        { 1890, -6.0 }, { 1892, -6.3 }, { 1894, -6.5 }, { 1896, -6.2 }, { 1898, -4.7 },
+        { 1900, -2.8 }, { 1902, -0.1 }, { 1904, 2.6 }, { 1906, 5.3 }, { 1908, 7.7 },
+        { 1910, 10.4 }, { 1912, 13.3 }, { 1914, 16.0 }, { 1916, 18.2 }, { 1918, 20.2 },
+        { 1920, 21.1 }, { 1922, 22.4 }, { 1924, 23.5 }, { 1926, 23.8 }, { 1928, 24.3 },
+        { 1930, 24.0 }, { 1932, 23.9 }, { 1934, 23.9 }, { 1936, 23.7 }, { 1938, 24.0 },
+        { 1940, 24.3 }, { 1942, 25.3 }, { 1944, 26.2 }, { 1946, 27.3 }, { 1948, 28.2 },
+        { 1950, 29.1 }, { 1952, 30.0 }, { 1954, 30.7 }, { 1956, 31.4 }, { 1958, 32.2 },
+        { 1960, 33.1 }, { 1962, 34.0 }, { 1964, 35.0 }, { 1966, 36.5 }, { 1968, 38.3 },
+        { 1970, 40.2 }, { 1972, 42.2 }, { 1974, 44.5 }, { 1976, 46.5 }, { 1978, 48.5 },
+        { 1980, 50.5 }, { 1982, 52.2 }, { 1984, 53.8 }, { 1986, 54.9 }, { 1988, 55.8 },
+        { 1990, 56.9 }, { 1992, 58.3 }, { 1994, 60.0 }, { 1996, 61.6 }, { 1998, 63.0 },
+    };
 }

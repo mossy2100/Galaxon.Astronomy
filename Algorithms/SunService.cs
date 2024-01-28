@@ -217,11 +217,11 @@ public class SunService(
     /// Calculate apparent solar longitude for a given instant specified as a
     /// DateTime (UT).
     /// </summary>
-    /// <param name="dtut">The instant specified as a DateTime (UT).</param>
+    /// <param name="dt">The instant specified as a DateTime (UT).</param>
     /// <returns>The longitude and latitude of the Sun, in radians, at the given
     /// instant.</returns>
-    public (double Lng, double Lat) CalcPosition(DateTime dtut)
+    public (double Lng, double Lat) CalcPosition(DateTime dt)
     {
-        return CalcPosition(TimeScaleService.DateTimeToJulianDateTerrestrial(dtut));
+        return CalcPosition(TimeScaleService.DateTimeToJulianDateTerrestrial(dt));
     }
 }

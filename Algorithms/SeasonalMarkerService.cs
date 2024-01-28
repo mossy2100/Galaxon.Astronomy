@@ -58,7 +58,8 @@ public class SeasonalMarkerService(SunService sunService)
                 "Must be in the range -1000..3000.");
         }
 
-        if (markerNumber is < ESeasonalMarker.NorthwardEquinox or > ESeasonalMarker.SouthernSolstice)
+        if (markerNumber is < ESeasonalMarker.NorthwardEquinox
+            or > ESeasonalMarker.SouthernSolstice)
         {
             throw new ArgumentOutOfRangeException(nameof(markerNumber), "Invalid value.");
         }
@@ -170,7 +171,8 @@ public class SeasonalMarkerService(SunService sunService)
         DateTime dttt = XDateTime.FromJulianDate(jdtt);
 
         // Subtract ∆T to get Universal Time.
-        var deltaT_ticks = (long)(TimeScaleService.CalcDeltaT(dttt) / XTimeSpan.SECONDS_PER_TICK);
+        var deltaT_ticks =
+            (long)(TimeScaleService.CalcDeltaTNASA(dttt) / XTimeSpan.SECONDS_PER_TICK);
         DateTime UT = dttt.Subtract(new TimeSpan(deltaT_ticks));
         return UT;
     }
