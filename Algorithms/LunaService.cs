@@ -7,23 +7,41 @@ using Galaxon.Numerics.Geometry;
 
 namespace Galaxon.Astronomy.Algorithms;
 
-public class MoonService(AstroObjectRepository astroObjectRepository)
+/// <summary>
+/// Calling this class LunaService as there was some earlier confusion with the word "moon"
+/// referring to "the Moon" as well as natural satellites.
+/// To avoid confusion the code now refers to the Moon as "Luna" and natural satellites as
+/// "satellites".
+/// </summary>
+/// <param name="astroObjectRepository"></param>
+public class LunaService(AstroObjectRepository astroObjectRepository)
 {
+    /// <summary>
+    /// Start point of Meeus' lunation number (LN) 0.
+    /// </summary>
     public static DateTime LUNATION_0_START { get; } =
         new (2000, 1, 6, 18, 14, 0, DateTimeKind.Utc);
 
-    private AstroObject? _moon;
+    /// <summary>
+    /// Cached reference to the AstroObject representing Luna.
+    /// </summary>
+    private AstroObject? _luna;
 
+    /// <summary>
+    /// Get the AstroObject representing Luna.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="DataNotFoundException"></exception>
     public AstroObject GetPlanet()
     {
-        if (_moon == null)
+        if (_luna == null)
         {
-            AstroObject? moon = astroObjectRepository.Load("Moon", "planet");
-            _moon = moon
-                ?? throw new DataNotFoundException("Could not find planet Moon in the database.");
+            AstroObject? luna = astroObjectRepository.Load("Luna", "planet");
+            _luna = luna
+                ?? throw new DataNotFoundException("Could not find the Moon (Luna) in the database.");
         }
 
-        return _moon;
+        return _luna;
     }
 
     /// <summary>
@@ -68,11 +86,11 @@ public class MoonService(AstroObjectRepository astroObjectRepository)
         double M = Deg2Rad(2.5534 + 29.105_356_70 * k - 0.000_001_4 * T2
             - 0.000_000_11 * T3);
 
-        // Calculate Moon's mean anomaly at time JDE (radians).
+        // Calculate Luna's mean anomaly at time JDE (radians).
         double L = Deg2Rad(201.5643 + 385.816_935_28 * k + 0.010_758_2 * T2
             + 0.000_012_38 * T3 - 0.000_000_058 * T4);
 
-        // Calculate Moon's argument of latitude (radians).
+        // Calculate Luna's argument of latitude (radians).
         double F = Deg2Rad(160.710_8 + 390.670_502_84 * k - 0.001_6118 * T2
             - 0.000_002_27 * T2 + 0.000_000_011 * T4);
 

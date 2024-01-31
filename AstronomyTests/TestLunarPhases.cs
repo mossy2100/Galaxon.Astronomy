@@ -17,7 +17,7 @@ public class TestLunarPhases
 
     private AstroObjectGroupRepository? _astroObjectGroupRepository;
 
-    private MoonService? _moonService;
+    private LunaService? _moonService;
 
     [TestInitialize]
     public void Init()
@@ -25,7 +25,7 @@ public class TestLunarPhases
         _astroDbContext = new AstroDbContext();
         _astroObjectGroupRepository = new AstroObjectGroupRepository(_astroDbContext);
         _astroObjectRepository = new AstroObjectRepository(_astroDbContext, _astroObjectGroupRepository);
-        _moonService = new MoonService(_astroObjectRepository);
+        _moonService = new LunaService(_astroObjectRepository);
     }
 
     /// <summary>
