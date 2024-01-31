@@ -99,7 +99,7 @@ public class SunService(
         // 29,000 light years in metres (rounded to 2 significant figures).
         sun.Orbit.SemiMajorAxis = XDouble.RoundSigFigs(29e3 * Length.MetresPerLightYear, 2);
         // 230 million years in seconds (rounded to 2 significant figures).
-        sun.Orbit.SiderealOrbitPeriod = XDouble.RoundSigFigs(230e6 * XTimeSpan.SECONDS_PER_YEAR, 2);
+        sun.Orbit.SiderealOrbitPeriod = XDouble.RoundSigFigs(230e6 * XGregorianCalendar.SECONDS_PER_YEAR, 2);
         // Orbital speed in m/s.
         sun.Orbit.AvgOrbitSpeed = 251e3;
         astroDbContext.SaveChanges();

@@ -29,6 +29,36 @@ public class JulianDateService
     public static DateTime START_J2000_EPOCH_UTC { get; } =
         new (2000, 1, 1, 11, 58, 55, 816, DateTimeKind.Utc);
 
+    /// <summary>
+    /// The number of days in a Julian Calendar year.
+    /// </summary>
+    public const double DAYS_PER_JULIAN_YEAR = 365.25;
+
+    /// <summary>
+    /// The number of ticks in a Julian Calendar year.
+    /// </summary>
+    public const long TICKS_PER_JULIAN_YEAR = (long)(DAYS_PER_JULIAN_YEAR * TimeSpan.TicksPerDay);
+
+    /// <summary>
+    /// The number of days in a Julian Calendar decade.
+    /// </summary>
+    public const double DAYS_PER_JULIAN_DECADE = 3652.5;
+
+    /// <summary>
+    /// The number of days in a Julian Calendar century.
+    /// </summary>
+    public const long DAYS_PER_JULIAN_CENTURY = 36_525L;
+
+    /// <summary>
+    /// The number of ticks in a Julian Calendar century.
+    /// </summary>
+    public const long TICKS_PER_JULIAN_CENTURY = DAYS_PER_JULIAN_CENTURY * TimeSpan.TicksPerDay;
+
+    /// <summary>
+    /// The number of days in a Julian Calendar millennium.
+    /// </summary>
+    public const long DAYS_PER_JULIAN_MILLENNIUM = 365_250L;
+
     #endregion Constants
 
     #region Conversion between Julian dates and other time scales
@@ -112,6 +142,16 @@ public class JulianDateService
         return JD_TT - TimeSpan.FromSeconds(deltaT).TotalDays;
     }
 
+    /// <summary>
+    /// Convert a Julian Date in Terrestrial Time (TT)  to a Julian Date in International Atomic Time (TAI).
+    /// </summary>
+    /// <param name="JD_TT">Julian Date in Terrestrial Time</param>
+    /// <returns>Julian Date in International Atomic Time</returns>
+    public static double JulianDate_TT_to_TAI(double JD_TT)
+    {
+        return JD_TT - ((double)TimeScaleService.TT_MINUS_TAI_MS / XTimeSpan.SECONDS_PER_DAY / 1000);
+    }
+
     #endregion Conversion between Julian dates and other time scales
 
     #region Julian periods since start J2000 epoch.
@@ -133,7 +173,7 @@ public class JulianDateService
     /// <returns></returns>
     public static double JulianYearsSinceJ2000(double JD_TT)
     {
-        return JulianDaysSinceJ2000(JD_TT) / XTimeSpan.DAYS_PER_JULIAN_YEAR;
+        return JulianDaysSinceJ2000(JD_TT) / DAYS_PER_JULIAN_YEAR;
     }
 
     /// <summary>
@@ -143,7 +183,7 @@ public class JulianDateService
     /// <returns></returns>
     public static double JulianCenturiesSinceJ2000(double JD_TT)
     {
-        return JulianDaysSinceJ2000(JD_TT) / XTimeSpan.DAYS_PER_JULIAN_CENTURY;
+        return JulianDaysSinceJ2000(JD_TT) / DAYS_PER_JULIAN_CENTURY;
     }
 
     /// <summary>
@@ -153,7 +193,7 @@ public class JulianDateService
     /// <returns></returns>
     public static double JulianMillenniaSinceJ2000(double JD_TT)
     {
-        return JulianDaysSinceJ2000(JD_TT) / XTimeSpan.DAYS_PER_JULIAN_MILLENNIUM;
+        return JulianDaysSinceJ2000(JD_TT) / DAYS_PER_JULIAN_MILLENNIUM;
     }
 
     #endregion Julian periods since start J2000 epoch.
