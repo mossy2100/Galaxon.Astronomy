@@ -9,27 +9,10 @@ namespace Galaxon.Astronomy.Algorithms;
 public class TimeScaleService(LeapSecondRepository leapSecondRepository)
 {
     /// <summary>
-    /// Number of seconds difference between TAI and TT.
-    /// TT = TAI + 32.184
+    /// Number of milliseconds difference between TAI and TT.
+    /// TT = TAI + 32,184 ms
     /// </summary>
-    public const double TT_MINUS_TAI = 32.184;
-
-    /// <summary>
-    /// The start point of the J2000 epoch as a Julian Date (TT).
-    /// The number of ephemeris days difference between the start of the Julian epoch and
-    /// the start of the J2000 epoch.
-    /// </summary>
-    public const double J2000_JULIAN_DATE = 2451545.0;
-
-    /// <summary>
-    /// The start point of the J2000 epoch in UTC.
-    /// This is equal to the Julian Date 2451545.0 TT, i.e. noon on 2000-01-01
-    /// in Terrestrial Time.
-    /// <see href="https://en.wikipedia.org/wiki/Epoch_(astronomy)#Julian_years_and_J2000"/>
-    /// </summary>
-    /// <returns>A DateTime object representing the start point of the J2000 epoch in UTC.</returns>
-    public static DateTime J2000_UTC { get; } =
-        new (2000, 1, 1, 11, 58, 55, 816, DateTimeKind.Utc);
+    public const int TT_MINUS_TAI_MS = 32_184 /* milliseconds */;
 
     /// <summary>
     /// Converts a Gregorian date into a single value representing the year with a fractional
@@ -97,9 +80,9 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     /// <returns></returns>
     public static double CalcDecimalYear(DateTime dt)
     {
-        long secondsInYear = XGregorianCalendar.DaysInYear(dt.Year) * XTimeSpan.SECONDS_PER_DAY;
-        long seconds = (dt.DayOfYear - 1) * XTimeSpan.SECONDS_PER_DAY + dt.TimeOfDay.Seconds;
-        return dt.Year + (double)seconds / secondsInYear;
+        double secondsInYear = XGregorianCalendar.DaysInYear(dt.Year) * XTimeSpan.SECONDS_PER_DAY;
+        double seconds = (dt.DayOfYear - 1) * XTimeSpan.SECONDS_PER_DAY + dt.TimeOfDay.TotalSeconds;
+        return dt.Year + seconds / secondsInYear;
     }
 
     /// <summary>
@@ -357,66 +340,26 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     }
 
     /// <summary>
-    /// Given a Julian Date in Universal Time (JD), find the equivalent in
-    /// Terrestrial Time (also known as the Julian Ephemeris Day, or JDE).
-    /// ∆T = TT - UT  =>  TT = UT + ∆T
+    /// Convert a value in Terrestrial Time (TT) to International Atomic Time (TAI).
     /// </summary>
-    /// <param name="jd">Julian Date in Universal Time</param>
-    /// <returns>Julian Date in Terrestrial Time</returns>
-    public static double JulianDateUniversalToTerrestrial(double jd)
+    /// <param name="TT_ticks">Terrestrial Time (TT) in ticks.</param>
+    /// <returns></returns>
+    public static ulong TT_to_TAI(ulong TT_ticks)
     {
-        DateTime dt = XDateTime.FromJulianDate(jd);
-        double deltaT = CalcDeltaTNASA(dt);
-        return jd + TimeSpan.FromSeconds(deltaT).TotalDays;
+        ulong TAI_ticks = TT_ticks - TT_MINUS_TAI_MS * TimeSpan.TicksPerMillisecond;
+        return TAI_ticks;
     }
 
     /// <summary>
-    /// Convert a Julian Date in Terrestrial Time (TT) (also known as the
-    /// Julian Ephemeris Day or JDE) to a Julian Date in Universal Time (JD).
-    /// ∆T = TT - UT  =>  UT = TT - ∆T
+    /// Convert a value in International Atomic Time (TAI) to Terrestrial Time (TT).
     /// </summary>
-    /// <param name="jdtt">Julian Date in Terrestrial Time</param>
-    /// <returns>Julian Date in Universal Time</returns>
-    public static double JulianDateTerrestrialToUniversal(double jdtt)
+    /// <param name="TAI_ticks">International Atomic Time (TAI) in ticks.</param>
+    /// <returns></returns>
+    public static ulong TAI_to_TT(ulong TAI_ticks)
     {
-        // Calculate deltaT using TT. It should be virtually identical to UT.
-        DateTime dt = XDateTime.FromJulianDate(jdtt);
-        double deltaT = CalcDeltaTNASA(dt);
-        return jdtt - TimeSpan.FromSeconds(deltaT).TotalDays;
+        ulong TT_ticks = TAI_ticks + TT_MINUS_TAI_MS * TimeSpan.TicksPerMillisecond;
+        return TT_ticks;
     }
-
-    public static double DateTimeToJulianDateTerrestrial(DateTime dt)
-    {
-        return JulianDateUniversalToTerrestrial(dt.ToJulianDate());
-    }
-
-    public static DateTime JulianDateTerrestrialToDateTime(double jdtt)
-    {
-        return XDateTime.FromJulianDate(JulianDateTerrestrialToUniversal(jdtt));
-    }
-
-    // /// <summary>
-    // /// Find out how many leap seconds there were or have been prior to the
-    // /// given instant.
-    // /// Get the latest info about leap seconds from IERS Bulletin A:
-    // /// <see href="https://www.iers.org/IERS/EN/Publications/Bulletins/bulletins.html"/>
-    // /// </summary>
-    // /// <param name="dt">A point in time. Defaults to current DateTime.</param>
-    // /// <returns>The number of leap seconds until then.</returns>
-    // /// <exception cref="ArgumentOutOfRangeException">If year less than
-    // /// 1972.</exception>
-    // public byte LeapSecondCount(DateTime dt = new ())
-    // {
-    //     // Check for valid year.
-    //     if (dt.Year < 1972)
-    //     {
-    //         throw new ArgumentOutOfRangeException(nameof(dt),
-    //             "The leap second count is only relevant from 1972, when they were introduced.");
-    //     }
-    //
-    //     // Count the leap seconds preceding the current date.
-    //     return (byte)leapSecondRepository.List.Sum(ls => ls.Value);
-    // }
 
     /// <summary>
     /// Total the value of all leap seconds (positive and negative) up to and including a certain
@@ -524,47 +467,7 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     /// <exception cref="ArgumentOutOfRangeException">If year less than 1972.</exception>
     public double CalcDUT1(DateTime dt = new ())
     {
-        return TT_MINUS_TAI - CalcDeltaTNASA(dt) + CalcTAIMinusUTC(dt);
-    }
-
-    /// <summary>
-    /// Number of days since beginning of the J2000.0 epoch, in TT.
-    /// </summary>
-    /// <param name="jdtt">The Julian Ephemeris Day.</param>
-    /// <returns></returns>
-    public static double JulianDaysSinceJ2000(double jdtt)
-    {
-        return jdtt - J2000_JULIAN_DATE;
-    }
-
-    /// <summary>
-    /// Number of Julian years since beginning of the J2000.0 epoch, in TT.
-    /// </summary>
-    /// <param name="jdtt">The Julian Ephemeris Day.</param>
-    /// <returns></returns>
-    public static double JulianYearsSinceJ2000(double jdtt)
-    {
-        return JulianDaysSinceJ2000(jdtt) / XTimeSpan.DAYS_PER_JULIAN_YEAR;
-    }
-
-    /// <summary>
-    /// Number of Julian centuries since beginning of the J2000.0 epoch, in TT.
-    /// </summary>
-    /// <param name="jdtt">The Julian Ephemeris Day.</param>
-    /// <returns></returns>
-    public static double JulianCenturiesSinceJ2000(double jdtt)
-    {
-        return JulianDaysSinceJ2000(jdtt) / XTimeSpan.DAYS_PER_JULIAN_CENTURY;
-    }
-
-    /// <summary>
-    /// Number of Julian millennia since beginning of the J2000.0 epoch, in TT.
-    /// </summary>
-    /// <param name="jdtt">The Julian Ephemeris Day.</param>
-    /// <returns></returns>
-    public static double JulianMillenniaSinceJ2000(double jdtt)
-    {
-        return JulianDaysSinceJ2000(jdtt) / XTimeSpan.DAYS_PER_JULIAN_MILLENNIUM;
+        return (TT_MINUS_TAI_MS / 1000.0) - CalcDeltaTNASA(dt) + CalcTAIMinusUTC(dt);
     }
 
     public void TestCalcDUT1()

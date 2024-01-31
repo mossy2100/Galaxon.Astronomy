@@ -65,9 +65,9 @@ public class LunaService(AstroObjectRepository astroObjectRepository)
         // I might have overdone it here on attempting to maximise precision for this calculation.
         // Testing will confirm.
         DateTime dtPhaseApprox = LUNATION_0_START.AddDays(k * XTimeSpan.DAYS_PER_LUNATION);
-        double JD = dtPhaseApprox.ToJulianDate();
-        double JDTT = TimeScaleService.JulianDateUniversalToTerrestrial(JD);
-        double T = TimeScaleService.JulianCenturiesSinceJ2000(JDTT);
+        double JD = JulianDateService.DateTime_to_JulianDate(dtPhaseApprox);
+        double JD_TT = JulianDateService.JulianDate_UT_to_TT(JD);
+        double T = JulianDateService.JulianCenturiesSinceJ2000(JD_TT);
         double T2 = T * T;
         double T3 = T * T2;
         double T4 = T * T3;
@@ -216,8 +216,8 @@ public class LunaService(AstroObjectRepository astroObjectRepository)
         JDE += C1 + C2;
 
         // Convert the JDE to a UTC DateTime.
-        JD = TimeScaleService.JulianDateTerrestrialToUniversal(JDE);
-        DateTime dtPhase = XDateTime.FromJulianDate(JD);
+        JD = JulianDateService.JulianDate_TT_to_UT(JDE);
+        DateTime dtPhase = JulianDateService.JulianDate_to_DateTime(JD);
 
         // Construct and return the LunarPhase object.
         return new LunarPhase { PhaseNumber = phaseType, UtcDateTime = dtPhase };

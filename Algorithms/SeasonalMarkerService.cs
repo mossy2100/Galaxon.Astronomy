@@ -156,7 +156,7 @@ public class SeasonalMarkerService(SunService sunService)
     public static DateTime CalcSeasonalMarkerApprox(int year, ESeasonalMarker markerNumber)
     {
         double JDE0 = CalcSeasonalMarkerMean(year, markerNumber);
-        double T = TimeScaleService.JulianCenturiesSinceJ2000(JDE0);
+        double T = JulianDateService.JulianCenturiesSinceJ2000(JDE0);
         double W = Angle.DegToRad(35999.373 * T - 2.47);
         double dLambda = 1 + 0.0334 * Cos(W) + 0.0007 * Cos(2 * W);
 
@@ -165,16 +165,19 @@ public class SeasonalMarkerService(SunService sunService)
         double S = terms.Sum(term => term.A * Cos(Angle.DegToRad(term.B + term.C * T)));
 
         // Equation from p178.
-        double jdtt = JDE0 + 0.00001 * S / dLambda;
+        double JD_TT = JDE0 + 0.00001 * S / dLambda;
 
         // Get the date in Terrestrial Time (TT).
-        DateTime dttt = XDateTime.FromJulianDate(jdtt);
+        DateTime dt_TT = JulianDateService.JulianDate_to_DateTime(JD_TT);
+
+        // Calculate ∆T.
+        var deltaT_ticks =
+            (long)(TimeScaleService.CalcDeltaTNASA(dt_TT) / XTimeSpan.SECONDS_PER_TICK);
 
         // Subtract ∆T to get Universal Time.
-        var deltaT_ticks =
-            (long)(TimeScaleService.CalcDeltaTNASA(dttt) / XTimeSpan.SECONDS_PER_TICK);
-        DateTime UT = dttt.Subtract(new TimeSpan(deltaT_ticks));
-        return UT;
+        DateTime dt_UT = dt_TT.Subtract(new TimeSpan(deltaT_ticks));
+
+        return dt_UT;
     }
 
     /// <summary>
@@ -186,23 +189,23 @@ public class SeasonalMarkerService(SunService sunService)
     /// <returns>The result in dynamical time.</returns>
     public DateTime CalcSeasonalMarker(int year, ESeasonalMarker markerNumber)
     {
-        double jd = CalcSeasonalMarkerMean(year, markerNumber);
+        double JD = CalcSeasonalMarkerMean(year, markerNumber);
         double k = (int)markerNumber;
         double targetLs = k * PI / 2;
         bool done;
         const double delta = 1E-9;
         do
         {
-            (double Bs, double Ls) = sunService.CalcPosition(jd);
+            (double Bs, double Ls) = sunService.CalcPosition(JD);
             double diffLs = targetLs - Ls;
             done = Abs(diffLs) < delta;
             if (!done)
             {
                 double correction = 58 * Sin(diffLs);
-                jd += correction;
+                JD += correction;
             }
         } while (!done);
 
-        return XDateTime.FromJulianDate(jd);
+        return JulianDateService.JulianDate_to_DateTime(JD);
     }
 }

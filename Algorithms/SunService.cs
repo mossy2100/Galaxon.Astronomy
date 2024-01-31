@@ -153,15 +153,15 @@ public class SunService(
     /// This method uses the higher accuracy algorithm from AA2 Ch25 p166
     /// (p174 in PDF)
     /// </summary>
-    /// <param name="jdtt">The Julian Ephemeris Day.</param>
+    /// <param name="JD_TT">The Julian Ephemeris Day.</param>
     /// <returns>The longitude of the Sun (Ls) in radians at the given
     /// instant.</returns>
-    public (double Lng, double Lat) CalcPosition(double jdtt)
+    public (double Lng, double Lat) CalcPosition(double JD_TT)
     {
         // Get the Earth's heliocentric position.
         var earth = earthService.GetPlanet();
         (double lngEarth, double latEarth, double R_m) =
-            planetService.CalcPlanetPosition(earth, jdtt);
+            planetService.CalcPlanetPosition(earth, JD_TT);
 
         // Reverse to get the mean dynamical ecliptic and equinox of the date.
         double lngSun = Angle.NormalizeRadians(lngEarth + PI);
@@ -170,7 +170,7 @@ public class SunService(
         // Convert to FK5.
         // This gives the true ("geometric") longitude of the Sun referred to the
         // mean equinox of the date.
-        double julCen = TimeScaleService.JulianCenturiesSinceJ2000(jdtt);
+        double julCen = JulianDateService.JulianCenturiesSinceJ2000(JD_TT);
         double lambdaPrime = lngSun - Angle.DegToRad(1.397) * julCen
             - Angle.DegToRad(0.000_31) * julCen * julCen;
         lngSun -= Angle.DmsToRad(0, 0, 0.090_33);
@@ -179,7 +179,7 @@ public class SunService(
         // TODO
         // To obtain the apparent longitude, nutation and aberration have to be
         // taken into account.
-        // SofaLibrary.iauNut06a(jdtt, 0, out double dpsi, out double deps);
+        // SofaLibrary.iauNut06a(JD_TT, 0, out double dpsi, out double deps);
         // lngSun += dpsi;
 
         // Calculate and add aberration.
@@ -216,14 +216,14 @@ public class SunService(
     }
 
     /// <summary>
-    /// Calculate apparent solar longitude for a given instant specified as a
-    /// DateTime (UT).
+    /// Calculate apparent solar longitude for a given instant specified as a DateTime (UT).
     /// </summary>
     /// <param name="dt">The instant specified as a DateTime (UT).</param>
-    /// <returns>The longitude and latitude of the Sun, in radians, at the given
-    /// instant.</returns>
+    /// <returns>The longitude and latitude of the Sun, in radians, at the given instant.</returns>
     public (double Lng, double Lat) CalcPosition(DateTime dt)
     {
-        return CalcPosition(TimeScaleService.DateTimeToJulianDateTerrestrial(dt));
+        double JD = JulianDateService.DateTime_to_JulianDate(dt);
+        double JD_TT = JulianDateService.JulianDate_UT_to_TT(JD);
+        return CalcPosition(JD_TT);
     }
 }

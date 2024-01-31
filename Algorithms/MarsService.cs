@@ -14,8 +14,17 @@ public class MarsService(AstroObjectRepository astroObjectRepository, PlanetServ
     /// </summary>
     public const double DAYS_PER_SOL = 1.02749;
 
+    /// <summary>
+    /// Cached reference to the AstroObject representing Mars.
+    /// </summary>
     private AstroObject? _mars;
 
+    /// <summary>
+    /// Get the AstroObject representing Mars.
+    /// </summary>
+    /// <exception cref="DataNotFoundException">
+    /// If the object could not be loaded from the database.
+    /// </exception>
     public AstroObject GetPlanet()
     {
         if (_mars == null)
@@ -28,14 +37,21 @@ public class MarsService(AstroObjectRepository astroObjectRepository, PlanetServ
         return _mars;
     }
 
-    public static double CalcMarsSolDate(double jd)
+    /// <summary>
+    /// Calculate the Mars Sol Date for a given point in time, expressed as a Julian Date.
+    /// </summary>
+    /// <param name="JD">The Julian Date.</param>
+    /// <returns>The Mars Sol Date.</returns>
+    public static double CalcMarsSolDate(double JD)
     {
-        return (jd - 2405522.0) / DAYS_PER_SOL;
+        var jd_tai = JulianDateService.JulianDate_UT_to_TT(JD);
+
+        return (JD - 2405522.0) / DAYS_PER_SOL;
     }
 
-    public (double L, double B, double R) CalcPosition(double jdtt)
+    public (double L, double B, double R) CalcPosition(double JD_TT)
     {
         AstroObject mars = GetPlanet();
-        return planetService.CalcPlanetPosition(mars, jdtt);
+        return planetService.CalcPlanetPosition(mars, JD_TT);
     }
 }

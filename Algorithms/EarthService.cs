@@ -11,8 +11,17 @@ namespace Galaxon.Astronomy.Algorithms;
 /// </summary>
 public class EarthService(AstroObjectRepository astroObjectRepository, PlanetService planetService)
 {
+    /// <summary>
+    /// Cached reference to the AstroObject representing Earth.
+    /// </summary>
     private AstroObject? _earth;
 
+    /// <summary>
+    /// Get the AstroObject representing Earth.
+    /// </summary>
+    /// <exception cref="DataNotFoundException">
+    /// If the object could not be loaded from the database.
+    /// </exception>
     public AstroObject GetPlanet()
     {
         if (_earth == null)
@@ -28,35 +37,35 @@ public class EarthService(AstroObjectRepository astroObjectRepository, PlanetSer
     /// <summary>
     /// Calculate the Earth Rotation Angle from the Julian Date in UT1.
     /// <see href="https://en.wikipedia.org/wiki/Sidereal_time#ERA"/>
-    /// TODO This method probably belongs in a different class.
     /// </summary>
-    /// <param name="jd">The Julian Date in UT1.</param>
+    /// <param name="JD">The Julian Date in UT1.</param>
     /// <returns>The Earth Rotation Angle.</returns>
-    public static double CalcEarthRotationAngle(double jd)
+    public static double CalcEarthRotationAngle(double JD)
     {
-        double t = TimeScaleService.JulianDaysSinceJ2000(jd);
+        double t = JulianDateService.JulianDaysSinceJ2000(JD);
         double radians = Tau * (0.779_057_273_264 + 1.002_737_811_911_354_48 * t);
         return Angle.NormalizeRadians(radians);
     }
 
     /// <summary>
-    /// Overload of CalcERA() that accepts a UTC DateTime.
+    /// Calculate the Earth Rotation Angle from a UTC DateTime.
     /// </summary>
     /// <param name="dt">The instant.</param>
     /// <returns>The ERA at the given instant.</returns>
     public static double CalcEarthRotationAngle(DateTime dt)
     {
-        return CalcEarthRotationAngle(dt.ToJulianDate());
+        double JD = JulianDateService.DateTime_to_JulianDate(dt);
+        return CalcEarthRotationAngle(JD);
     }
 
     /// <summary>
     /// Calculate the heliocentric position of Earth at a given point in time.
     /// </summary>
-    /// <param name="jdtt">The Julian Date in Terrestrial Time.</param>
+    /// <param name="JD_TT">The Julian Date in Terrestrial Time.</param>
     /// <returns>Heliocentric coordinates of Earth.</returns>
-    public (double L, double B, double R) CalcPosition(double jdtt)
+    public (double L, double B, double R) CalcPosition(double JD_TT)
     {
         AstroObject earth = GetPlanet();
-        return planetService.CalcPlanetPosition(earth, jdtt);
+        return planetService.CalcPlanetPosition(earth, JD_TT);
     }
 }

@@ -87,11 +87,11 @@ public class TestPlanets
             Assert.Fail("Could not find Saturn in the database.");
             return;
         }
-        var dttt = new DateTime(1999, 7, 26, 0, 0, 0, DateTimeKind.Utc);
-        double jdtt = dttt.ToJulianDate();
+        var dt_TT = new DateTime(1999, 7, 26, 0, 0, 0, DateTimeKind.Utc);
+        double JD_TT = JulianDateService.DateTime_to_JulianDate(dt_TT);
 
         // Act.
-        (double actualL, double B, double R) = _planetService!.CalcPlanetPosition(saturn, jdtt);
+        (double actualL, double B, double R) = _planetService!.CalcPlanetPosition(saturn, JD_TT);
 
         // Assert.
         double expectedL = Angle.DegToRad(39.972_3901);

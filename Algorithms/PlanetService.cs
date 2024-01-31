@@ -21,12 +21,14 @@ public class PlanetService(AstroDbContext astroDbContext)
     /// <see href="ftp://ftp.imcce.fr/pub/ephem/planets/vsop87"/>
     /// </summary>
     /// <param name="planet">The planet.</param>
-    /// <param name="jdtt">The Julian Ephemeris Day.</param>
-    /// <returns>The planet's position in heliocentric ecliptic
-    /// coordinates.</returns>
-    /// <exception cref="DataNotFoundException">If no VSOP87D data could be
-    /// found for the planet.</exception>
-    public (double L, double B, double R) CalcPlanetPosition(AstroObject planet, double jdtt)
+    /// <param name="JD_TT">The Julian Ephemeris Day.</param>
+    /// <returns>
+    /// The planet's position in heliocentric ecliptic coordinates (radians).
+    /// </returns>
+    /// <exception cref="DataNotFoundException">
+    /// If no VSOP87D data could be found for the planet.
+    /// </exception>
+    public (double L, double B, double R) CalcPlanetPosition(AstroObject planet, double JD_TT)
     {
         // Get the VSOP87D data for the planet from the database.
         // These aren't included in Load() so I may need to get them separately
@@ -42,7 +44,7 @@ public class PlanetService(AstroDbContext astroDbContext)
         }
 
         // Get T in Julian millennia from the epoch J2000.0.
-        double T = TimeScaleService.JulianMillenniaSinceJ2000(jdtt);
+        double T = JulianDateService.JulianMillenniaSinceJ2000(JD_TT);
 
         // Calculate the coefficients for each coordinate variable.
         Dictionary<char, double[]> coeffs = new ();
