@@ -1,4 +1,4 @@
-namespace Galaxon.Astronomy.Enums;
+namespace Galaxon.Astronomy.Data.Enums;
 
 public enum ELunarPhase
 {

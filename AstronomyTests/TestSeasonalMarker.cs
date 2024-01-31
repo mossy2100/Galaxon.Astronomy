@@ -1,4 +1,4 @@
-﻿using Galaxon.Astronomy.Enums;
+﻿using Galaxon.Astronomy.Data.Enums;
 using Galaxon.Astronomy.Algorithms;
 using Galaxon.Core.Testing;
 

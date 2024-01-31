@@ -1,6 +1,7 @@
 ﻿using Galaxon.Astronomy.Data;
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Models;
 using Galaxon.Astronomy.Algorithms;
+using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Numerics.Geometry;
 using GeoCoordinatePortable;
 
@@ -9,13 +10,26 @@ namespace Galaxon.Astronomy.Tests;
 [TestClass]
 public class TestCoordinates
 {
+    private AstroDbContext? _astroDbContext;
+
+    private AstroObjectRepository? _astroObjectRepository;
+
+    private AstroObjectGroupRepository? _astroObjectGroupRepository;
+
+    [TestInitialize]
+    public void Init()
+    {
+        _astroDbContext = new AstroDbContext();
+        _astroObjectGroupRepository = new AstroObjectGroupRepository(_astroDbContext);
+        _astroObjectRepository =
+            new AstroObjectRepository(_astroDbContext, _astroObjectGroupRepository);
+    }
+
     [TestMethod]
     public void TestShortestDistance()
     {
         // Calculate distance in metres.
-        using AstroDbContext astroDbContext = new ();
-        AstroObjectRepository astroObjectRepository = new (astroDbContext);
-        AstroObject? earth = astroObjectRepository.Load("Earth");
+        AstroObject? earth = _astroObjectRepository?.Load("Earth", "planet");
 
         if (earth == null)
         {

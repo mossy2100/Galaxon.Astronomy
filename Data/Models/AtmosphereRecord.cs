@@ -1,7 +1,6 @@
-﻿using Galaxon.Astronomy.Data;
-using Galaxon.Core.Exceptions;
+﻿using Galaxon.Core.Exceptions;
 
-namespace Galaxon.Astronomy.Models;
+namespace Galaxon.Astronomy.Data.Models;
 
 public class AtmosphereRecord
 {

@@ -1,7 +1,8 @@
 using System.Globalization;
 using CsvHelper;
-using Galaxon.Astronomy.Enums;
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Models;
+using Galaxon.Astronomy.Data.Repositories;
+using Galaxon.Astronomy.Data.Enums;
 using Galaxon.Core.Exceptions;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Strings;
@@ -9,7 +10,10 @@ using Galaxon.Core.Time;
 
 namespace Galaxon.Astronomy.Data;
 
-public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository astroObjectRepository)
+public class ImportData(
+    AstroDbContext astroDbContext,
+    AstroObjectRepository astroObjectRepository,
+    AstroObjectGroupRepository astroObjectGroupRepository)
 {
     /// <summary>
     /// Parse the data file from the US Census Bureau.
@@ -136,47 +140,6 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
     }
 
     /// <summary>
-    /// Initialise the data table with the current dates that had leap seconds.
-    /// </summary>
-    public static void ParseLeapSeconds()
-    {
-        using AstroDbContext db = new ();
-
-        // Load the HTML table as a string.
-        var dataFilePath =
-            $"{AstroDbContext.DataDirectory()}/Leap seconds/Leap second and UT1-UTC information _ NIST.html";
-        string html = File.ReadAllText(dataFilePath);
-
-        // Get the dates.
-        Regex rxDate = new (@"(\d{4})-(\d{2})-(\d{2})");
-        MatchCollection matches = rxDate.Matches(html);
-        List<DateOnly> dates = new ();
-        foreach (Match match in matches)
-        {
-            var year = int.Parse(match.Groups[1].Value);
-            var month = int.Parse(match.Groups[2].Value);
-            var day = int.Parse(match.Groups[3].Value);
-            DateOnly date = new (year, month, day);
-            dates.Add(date);
-        }
-
-        // Sort, then add to database.
-        if (dates.Count > 0)
-        {
-            foreach (DateOnly dt in dates.OrderBy(d => d.GetTotalDays()))
-            {
-                LeapSecond? existingRecord = db.LeapSeconds.FirstOrDefault(ls => ls.Date == dt);
-                if (existingRecord == null)
-                {
-                    // Add a new record.
-                    db.LeapSeconds.Add(new LeapSecond { Date = dt });
-                    db.SaveChanges();
-                }
-            }
-        }
-    }
-
-    /// <summary>
     /// Extract the lunar phase data from the web pages captured from
     /// AstroPixels and copy the data into the database.
     /// </summary>
@@ -254,85 +217,93 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
     /// <summary>
     /// Initialize all the groups.
     /// </summary>
-    public static void InitializeAstroObjects()
+    public void InitializeAstroObjects()
     {
         using AstroDbContext db = new ();
 
         // Stars.
-        AstroObjectGroup star = AstroObjectGroup.CreateOrUpdate(db, "Star");
-        AstroObjectGroup.CreateOrUpdate(db, "Hypergiant", star);
-        AstroObjectGroup.CreateOrUpdate(db, "Supergiant", star);
+        AstroObjectGroup star = astroObjectGroupRepository.CreateOrUpdate("Star");
+        astroObjectGroupRepository.CreateOrUpdate("Hypergiant", star);
+        astroObjectGroupRepository.CreateOrUpdate("Supergiant", star);
 
-        AstroObjectGroup giantStar = AstroObjectGroup.CreateOrUpdate(db, "Giant", star);
-        AstroObjectGroup.CreateOrUpdate(db, "Subgiant", giantStar);
-        AstroObjectGroup.CreateOrUpdate(db, "Bright giant", giantStar);
-        AstroObjectGroup.CreateOrUpdate(db, "Red giant", giantStar);
-        AstroObjectGroup.CreateOrUpdate(db, "Yellow giant", giantStar);
-        AstroObjectGroup.CreateOrUpdate(db, "Blue giant", giantStar);
-        AstroObjectGroup.CreateOrUpdate(db, "White giant", giantStar);
+        AstroObjectGroup giantStar = astroObjectGroupRepository.CreateOrUpdate("Giant", star);
+        astroObjectGroupRepository.CreateOrUpdate("Subgiant", giantStar);
+        astroObjectGroupRepository.CreateOrUpdate("Bright giant", giantStar);
+        astroObjectGroupRepository.CreateOrUpdate("Red giant", giantStar);
+        astroObjectGroupRepository.CreateOrUpdate("Yellow giant", giantStar);
+        astroObjectGroupRepository.CreateOrUpdate("Blue giant", giantStar);
+        astroObjectGroupRepository.CreateOrUpdate("White giant", giantStar);
 
-        AstroObjectGroup mainSequence = AstroObjectGroup.CreateOrUpdate(db, "Main sequence", star);
-        AstroObjectGroup.CreateOrUpdate(db, "Red dwarf", mainSequence);
-        AstroObjectGroup.CreateOrUpdate(db, "Orange dwarf", mainSequence);
-        AstroObjectGroup.CreateOrUpdate(db, "Yellow dwarf", mainSequence);
-        AstroObjectGroup.CreateOrUpdate(db, "Blue main sequence star", mainSequence);
-        AstroObjectGroup.CreateOrUpdate(db, "White dwarf", mainSequence);
+        AstroObjectGroup mainSequence =
+            astroObjectGroupRepository.CreateOrUpdate("Main sequence", star);
+        astroObjectGroupRepository.CreateOrUpdate("Red dwarf", mainSequence);
+        astroObjectGroupRepository.CreateOrUpdate("Orange dwarf", mainSequence);
+        astroObjectGroupRepository.CreateOrUpdate("Yellow dwarf", mainSequence);
+        astroObjectGroupRepository.CreateOrUpdate("Blue main sequence star", mainSequence);
+        astroObjectGroupRepository.CreateOrUpdate("White dwarf", mainSequence);
 
-        AstroObjectGroup.CreateOrUpdate(db, "Subdwarf", star);
-        AstroObjectGroup.CreateOrUpdate(db, "Brown dwarf", star);
+        astroObjectGroupRepository.CreateOrUpdate("Subdwarf", star);
+        astroObjectGroupRepository.CreateOrUpdate("Brown dwarf", star);
 
         // Planets.
-        AstroObjectGroup planet = AstroObjectGroup.CreateOrUpdate(db, "Planet");
-        AstroObjectGroup.CreateOrUpdate(db, "Terrestrial planet", planet);
+        AstroObjectGroup planet = astroObjectGroupRepository.CreateOrUpdate("Planet");
+        astroObjectGroupRepository.CreateOrUpdate("Terrestrial planet", planet);
 
-        AstroObjectGroup giantPlanet = AstroObjectGroup.CreateOrUpdate(db, "Giant planet", planet);
-        AstroObjectGroup.CreateOrUpdate(db, "Gas giant", giantPlanet);
-        AstroObjectGroup.CreateOrUpdate(db, "Ice giant", giantPlanet);
+        AstroObjectGroup giantPlanet =
+            astroObjectGroupRepository.CreateOrUpdate("Giant planet", planet);
+        astroObjectGroupRepository.CreateOrUpdate("Gas giant", giantPlanet);
+        astroObjectGroupRepository.CreateOrUpdate("Ice giant", giantPlanet);
 
         // Planetoids.
-        AstroObjectGroup minorPlanet = AstroObjectGroup.CreateOrUpdate(db, "Minor planet");
-        AstroObjectGroup.CreateOrUpdate(db, "Centaur", minorPlanet);
-        AstroObjectGroup.CreateOrUpdate(db, "Trojan", minorPlanet);
-        AstroObjectGroup.CreateOrUpdate(db, "Quasi-satellite", minorPlanet);
+        AstroObjectGroup minorPlanet = astroObjectGroupRepository.CreateOrUpdate("Minor planet");
+        astroObjectGroupRepository.CreateOrUpdate("Centaur", minorPlanet);
+        astroObjectGroupRepository.CreateOrUpdate("Trojan", minorPlanet);
+        astroObjectGroupRepository.CreateOrUpdate("Quasi-satellite", minorPlanet);
 
         AstroObjectGroup dwarfPlanet =
-            AstroObjectGroup.CreateOrUpdate(db, "Dwarf planet", minorPlanet);
-        AstroObjectGroup.CreateOrUpdate(db, "Plutoid", dwarfPlanet);
+            astroObjectGroupRepository.CreateOrUpdate("Dwarf planet", minorPlanet);
+        astroObjectGroupRepository.CreateOrUpdate("Plutoid", dwarfPlanet);
 
-        AstroObjectGroup asteroid = AstroObjectGroup.CreateOrUpdate(db, "Asteroid", minorPlanet);
-        AstroObjectGroup.CreateOrUpdate(db, "Potentially hazardous asteroid", asteroid);
+        AstroObjectGroup asteroid =
+            astroObjectGroupRepository.CreateOrUpdate("Asteroid", minorPlanet);
+        astroObjectGroupRepository.CreateOrUpdate("Potentially hazardous asteroid", asteroid);
 
-        AstroObjectGroup nea = AstroObjectGroup.CreateOrUpdate(db, "Near Earth asteroid", asteroid);
-        AstroObjectGroup.CreateOrUpdate(db, "Apohele asteroid", nea);
-        AstroObjectGroup.CreateOrUpdate(db, "Aten asteroid", nea);
-        AstroObjectGroup.CreateOrUpdate(db, "Apollo asteroid", nea);
-        AstroObjectGroup.CreateOrUpdate(db, "Amor asteroid", nea);
+        AstroObjectGroup nea =
+            astroObjectGroupRepository.CreateOrUpdate("Near Earth asteroid", asteroid);
+        astroObjectGroupRepository.CreateOrUpdate("Apohele asteroid", nea);
+        astroObjectGroupRepository.CreateOrUpdate("Aten asteroid", nea);
+        astroObjectGroupRepository.CreateOrUpdate("Apollo asteroid", nea);
+        astroObjectGroupRepository.CreateOrUpdate("Amor asteroid", nea);
 
-        AstroObjectGroup sssb = AstroObjectGroup.CreateOrUpdate(db, "Small Solar System body");
-        AstroObjectGroup.CreateOrUpdate(db, "Comet", sssb);
+        AstroObjectGroup sssb =
+            astroObjectGroupRepository.CreateOrUpdate("Small Solar System body");
+        astroObjectGroupRepository.CreateOrUpdate("Comet", sssb);
 
-        AstroObjectGroup tno = AstroObjectGroup.CreateOrUpdate(db, "Trans-Neptunian Object");
-        AstroObjectGroup.CreateOrUpdate(db, "Oort cloud", tno);
+        AstroObjectGroup tno = astroObjectGroupRepository.CreateOrUpdate("Trans-Neptunian Object");
+        astroObjectGroupRepository.CreateOrUpdate("Oort cloud", tno);
 
-        AstroObjectGroup kbo = AstroObjectGroup.CreateOrUpdate(db, "Kuper Belt Object", tno);
-        AstroObjectGroup.CreateOrUpdate(db, "Cubewano", kbo);
-        AstroObjectGroup resonentKbo = AstroObjectGroup.CreateOrUpdate(db, "Resonant KBO", kbo);
-        AstroObjectGroup.CreateOrUpdate(db, "Plutino", resonentKbo);
+        AstroObjectGroup kbo = astroObjectGroupRepository.CreateOrUpdate("Kuper Belt Object", tno);
+        astroObjectGroupRepository.CreateOrUpdate("Cubewano", kbo);
+        AstroObjectGroup resonentKbo =
+            astroObjectGroupRepository.CreateOrUpdate("Resonant KBO", kbo);
+        astroObjectGroupRepository.CreateOrUpdate("Plutino", resonentKbo);
 
-        AstroObjectGroup sdo = AstroObjectGroup.CreateOrUpdate(db, "Scattered-disc object", tno);
-        AstroObjectGroup.CreateOrUpdate(db, "Resonant SDO", sdo);
+        AstroObjectGroup sdo =
+            astroObjectGroupRepository.CreateOrUpdate("Scattered-disc object", tno);
+        astroObjectGroupRepository.CreateOrUpdate("Resonant SDO", sdo);
 
         AstroObjectGroup etno =
-            AstroObjectGroup.CreateOrUpdate(db, "Extreme Trans-Neptunian object", tno);
-        AstroObjectGroup detached = AstroObjectGroup.CreateOrUpdate(db, "Detached object", etno);
-        AstroObjectGroup.CreateOrUpdate(db, "Sednoid", detached);
+            astroObjectGroupRepository.CreateOrUpdate("Extreme Trans-Neptunian object", tno);
+        AstroObjectGroup detached =
+            astroObjectGroupRepository.CreateOrUpdate("Detached object", etno);
+        astroObjectGroupRepository.CreateOrUpdate("Sednoid", detached);
 
         // Satellites.
-        AstroObjectGroup satellite = AstroObjectGroup.CreateOrUpdate(db, "Satellite");
-        AstroObjectGroup.CreateOrUpdate(db, "Regular satellite", satellite);
-        AstroObjectGroup.CreateOrUpdate(db, "Irregular satellite", satellite);
-        AstroObjectGroup.CreateOrUpdate(db, "Prograde satellite", satellite);
-        AstroObjectGroup.CreateOrUpdate(db, "Retrograde satellite", satellite);
+        AstroObjectGroup satellite = astroObjectGroupRepository.CreateOrUpdate("Satellite");
+        astroObjectGroupRepository.CreateOrUpdate("Regular satellite", satellite);
+        astroObjectGroupRepository.CreateOrUpdate("Irregular satellite", satellite);
+        astroObjectGroupRepository.CreateOrUpdate("Prograde satellite", satellite);
+        astroObjectGroupRepository.CreateOrUpdate("Retrograde satellite", satellite);
     }
 
     /// <summary>
@@ -387,8 +358,8 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
             planet.Number = num == null ? null : uint.Parse(num);
 
             // Set its groups.
-            astroObjectRepository.AddToGroup(planet, "planet");
-            astroObjectRepository.AddToGroup(planet, $"{type} planet");
+            astroObjectGroupRepository.AddToGroup(planet, "planet");
+            astroObjectGroupRepository.AddToGroup(planet, $"{type} planet");
 
             // Set its parent.
             planet.Parent = sun;
@@ -695,6 +666,7 @@ public class ImportData(AstroDbContext astroDbContext, AstroObjectRepository ast
             }
         }
     }
+
     /// <summary>
     /// Get a planet name given a number.
     /// </summary>

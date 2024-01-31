@@ -1,6 +1,6 @@
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Models;
 
-namespace Galaxon.Astronomy.Data;
+namespace Galaxon.Astronomy.Data.Repositories;
 
 public class DeltaTRepository
 {

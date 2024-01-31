@@ -1,6 +1,4 @@
-﻿using Galaxon.Astronomy.Data;
-
-namespace Galaxon.Astronomy.Models;
+﻿namespace Galaxon.Astronomy.Data.Models;
 
 public class Molecule
 {

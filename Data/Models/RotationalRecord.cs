@@ -1,4 +1,4 @@
-﻿namespace Galaxon.Astronomy.Models;
+﻿namespace Galaxon.Astronomy.Data.Models;
 
 public class RotationalRecord
 {

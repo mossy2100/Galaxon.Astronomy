@@ -1,6 +1,6 @@
-using Galaxon.Astronomy.Data;
-using Galaxon.Astronomy.Enums;
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Repositories;
+using Galaxon.Astronomy.Data.Enums;
+using Galaxon.Astronomy.Data.Models;
 using Galaxon.Core.Exceptions;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;

@@ -1,9 +1,7 @@
-﻿namespace Galaxon.Astronomy.Models;
+﻿namespace Galaxon.Astronomy.Data.Models;
 
 public class MinorPlanetRecord
 {
-    #region Properties
-
     // Primary key.
     public int Id { get; set; }
 
@@ -40,6 +38,4 @@ public class MinorPlanetRecord
 
     // SMASS spectral type.
     public string? SMASS { get; set; }
-
-    #endregion Properties
 }

@@ -1,35 +1,23 @@
-﻿using Galaxon.Astronomy.Data;
-
-namespace Galaxon.Astronomy.Models;
+﻿namespace Galaxon.Astronomy.Data.Models;
 
 public class LeapSecond
 {
-    #region Properties
-
     public int Id { get; set; }
 
     [Column(TypeName = "date")]
-    public DateOnly Date { get; set; }
+    public DateOnly IersBulletinCDate { get; set; }
 
     /// <summary>
-    /// Cache of the leap seconds so we don't have to keep loading them in the
-    /// event they're needed more than once during a program.
+    /// This will be:
+    ///    -1 for a negative leap second (none so far, but possible within 12 years)
+    ///     0 for no leap second
+    ///     1 for a positive leap second (37 so far at the time of coding)
     /// </summary>
-    private static List<LeapSecond>? _list;
+    public sbyte Value { get; set; }
 
-    public static List<LeapSecond> List
-    {
-        get
-        {
-            if (_list == null)
-            {
-                // Load the leap seconds from the database.
-                using AstroDbContext db = new ();
-                _list = db.LeapSeconds.ToList();
-            }
-            return _list;
-        }
-    }
-
-    #endregion Properties
+    /// <summary>
+    /// The date the leap second will be inserted, if there is one.
+    /// </summary>
+    [Column(TypeName = "date")]
+    public DateOnly? LeapSecondDate { get; set; }
 }

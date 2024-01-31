@@ -1,6 +1,7 @@
 ﻿using Galaxon.Astronomy.Data;
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Models;
 using Galaxon.Astronomy.Algorithms;
+using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 using Galaxon.Quantities;
@@ -14,13 +15,17 @@ public class TestPlanets
 
     private AstroObjectRepository? _astroObjectRepository;
 
+    private AstroObjectGroupRepository? _astroObjectGroupRepository;
+
     private PlanetService? _planetService;
 
     [TestInitialize]
     public void Init()
     {
         _astroDbContext = new AstroDbContext();
-        _astroObjectRepository = new AstroObjectRepository(_astroDbContext);
+        _astroObjectGroupRepository = new AstroObjectGroupRepository(_astroDbContext);
+        _astroObjectRepository =
+            new AstroObjectRepository(_astroDbContext, _astroObjectGroupRepository);
         _planetService = new PlanetService(_astroDbContext);
     }
 
@@ -76,9 +81,7 @@ public class TestPlanets
     public void TestCalcPositionSaturn()
     {
         // Arrange.
-        using AstroDbContext astroDbContext = new ();
-        AstroObjectRepository astroObjectRepository = new (astroDbContext);
-        AstroObject? saturn = astroObjectRepository.Load("Saturn");
+        AstroObject? saturn = _astroObjectRepository?.Load("Saturn");
         if (saturn == null)
         {
             Assert.Fail("Could not find Saturn in the database.");

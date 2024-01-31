@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Galaxon.Astronomy.Data;
+namespace Galaxon.Astronomy.Data.Converters;
 
 public class DateOnlyConverter : ValueConverter<DateOnly, DateTime>
 {

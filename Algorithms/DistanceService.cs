@@ -1,4 +1,4 @@
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Models;
 using Galaxon.Numerics.Geometry;
 using GeoCoordinatePortable;
 

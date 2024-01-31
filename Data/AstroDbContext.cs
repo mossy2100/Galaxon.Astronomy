@@ -1,4 +1,5 @@
-﻿using Galaxon.Astronomy.Models;
+﻿using Galaxon.Astronomy.Data.Converters;
+using Galaxon.Astronomy.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

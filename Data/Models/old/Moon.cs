@@ -1,7 +1,7 @@
 ﻿using Galaxon.Astronomy.Database;
 using Galaxon.Core.Strings;
 
-namespace Galaxon.Astronomy.Models;
+namespace Galaxon.Astronomy.Data.Models;
 
 /// <summary>
 /// Represents a planetary satellite.

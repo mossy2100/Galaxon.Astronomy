@@ -1,5 +1,6 @@
 ﻿using Galaxon.Astronomy.Data;
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Repositories;
+using Galaxon.Astronomy.Data.Models;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
@@ -10,6 +11,7 @@ namespace Galaxon.Astronomy.Algorithms;
 public class SunService(
     AstroDbContext astroDbContext,
     AstroObjectRepository astroObjectRepository,
+    AstroObjectGroupRepository astroObjectGroupRepository,
     EarthService earthService,
     PlanetService planetService)
 {
@@ -31,7 +33,7 @@ public class SunService(
         }
 
         // Set the Sun's basic details.
-        astroObjectRepository.AddToGroup(sun, "star");
+        astroObjectGroupRepository.AddToGroup(sun, "star");
 
         // Save the Sun object so it has an Id.
         astroDbContext.SaveChanges();

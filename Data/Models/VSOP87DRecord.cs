@@ -1,4 +1,4 @@
-﻿namespace Galaxon.Astronomy.Models;
+﻿namespace Galaxon.Astronomy.Data.Models;
 
 /// <summary>
 /// Represents a record containing VSOP87D planetary data.

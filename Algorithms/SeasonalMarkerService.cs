@@ -1,4 +1,4 @@
-using Galaxon.Astronomy.Enums;
+using Galaxon.Astronomy.Data.Enums;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Algebra;
 using Galaxon.Numerics.Geometry;

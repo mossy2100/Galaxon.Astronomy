@@ -1,11 +1,12 @@
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Models;
+using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Core.Exceptions;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Algebra;
 
 namespace Galaxon.Astronomy.Algorithms;
 
-public static class TimeScaleService
+public class TimeScaleService(LeapSecondRepository leapSecondRepository)
 {
     /// <summary>
     /// Number of seconds difference between TAI and TT.
@@ -394,27 +395,102 @@ public static class TimeScaleService
         return XDateTime.FromJulianDate(JulianDateTerrestrialToUniversal(jdtt));
     }
 
-    /// <summary>
-    /// Find out how many leap seconds there were or have been prior to the
-    /// given instant.
-    /// Get the latest info about leap seconds from IERS Bulletin A:
-    /// <see href="https://www.iers.org/IERS/EN/Publications/Bulletins/bulletins.html"/>
-    /// </summary>
-    /// <param name="dt">A point in time. Defaults to current DateTime.</param>
-    /// <returns>The number of leap seconds until then.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">If year less than
-    /// 1972.</exception>
-    public static byte LeapSecondCount(DateTime dt = new ())
-    {
-        // Check for valid year.
-        if (dt.Year < 1972)
-        {
-            throw new ArgumentOutOfRangeException(nameof(dt),
-                "The leap second count is only relevant from 1972, when they were introduced.");
-        }
+    // /// <summary>
+    // /// Find out how many leap seconds there were or have been prior to the
+    // /// given instant.
+    // /// Get the latest info about leap seconds from IERS Bulletin A:
+    // /// <see href="https://www.iers.org/IERS/EN/Publications/Bulletins/bulletins.html"/>
+    // /// </summary>
+    // /// <param name="dt">A point in time. Defaults to current DateTime.</param>
+    // /// <returns>The number of leap seconds until then.</returns>
+    // /// <exception cref="ArgumentOutOfRangeException">If year less than
+    // /// 1972.</exception>
+    // public byte LeapSecondCount(DateTime dt = new ())
+    // {
+    //     // Check for valid year.
+    //     if (dt.Year < 1972)
+    //     {
+    //         throw new ArgumentOutOfRangeException(nameof(dt),
+    //             "The leap second count is only relevant from 1972, when they were introduced.");
+    //     }
+    //
+    //     // Count the leap seconds preceding the current date.
+    //     return (byte)leapSecondRepository.List.Sum(ls => ls.Value);
+    // }
 
-        // Count the leap seconds preceding the current date.
-        return (byte)LeapSecond.List.Count(ls => ls.Date.ToDateTime() < dt);
+    /// <summary>
+    /// Total the value of all leap seconds (positive and negative) up to and including a certain
+    /// date.
+    /// </summary>
+    /// <param name="d">The date.</param>
+    /// <returns>The total value of leap seconds inserted.</returns>
+    public int TotalLeapSeconds(DateOnly d)
+    {
+        int total = 0;
+        foreach (LeapSecond ls in leapSecondRepository.List)
+        {
+            // This should always be false, but we should check.
+            if (ls.LeapSecondDate == null)
+            {
+                continue;
+            }
+
+            // If the leap second date is earlier than or equal to the date argument, add the value
+            // of the leap second (-1, 0, or 1). We're assuming that we want the total leap seconds
+            // up to the very end of the given date.
+            if (ls.LeapSecondDate.Value <= d)
+            {
+                total += ls.Value;
+            }
+        }
+        return total;
+    }
+
+    /// <summary>
+    /// Total the value of all leap seconds (positive and negative) up to and including a certain
+    /// datetime.
+    /// This is slightly different to the DateOnly version, because any DateTime will be earlier
+    /// than a leap second introduced that day, because the actual datetime of the leap second,
+    /// which will have a time of day of 23:59:60, isn't representable as a DateTime.
+    /// </summary>
+    /// <param name="dt">The datetime.</param>
+    /// <returns>The total value of leap seconds inserted.</returns>
+    public int TotalLeapSeconds(DateTime dt)
+    {
+        int total = 0;
+        foreach (LeapSecond ls in leapSecondRepository.List)
+        {
+            // This should always be false, but we should check.
+            if (ls.LeapSecondDate == null)
+            {
+                continue;
+            }
+
+            // Get the datetime of the leap second.
+            // When creating the new DateTime we use the same DateTimeKind as the argument so the
+            // comparison works correctly. The time of day will be set to 00:00:00.
+            DateTime dtLeapSecond = ls.LeapSecondDate.Value.ToDateTime(dt.Kind);
+            // The actual time of day for the leap second is 23:59:60, which can't be represented
+            // using DateTime. So we'll use the time 00:00:00 of the next day.
+            dtLeapSecond = dtLeapSecond.AddDays(1);
+
+            // If the datetime of the leap second is before or equal to the datetime argument, add
+            // the value of the leap second (-1, 0, or 1) to the total.
+            if (dtLeapSecond <= dt)
+            {
+                total += ls.Value;
+            }
+        }
+        return total;
+    }
+
+    /// <summary>
+    /// Total the value of all leap seconds (positive and negative) up to the current datetime.
+    /// </summary>
+    /// <returns>The total value of leap seconds inserted thus far.</returns>
+    public int TotalLeapSeconds()
+    {
+        return TotalLeapSeconds(XDateTime.GetCurrentUtc());
     }
 
     /// <summary>
@@ -424,9 +500,9 @@ public static class TimeScaleService
     /// DateTime.</param>
     /// <returns>The integer number of seconds difference.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If year less than 1972.</exception>
-    public static byte CalcTAIMinusUTC(DateTime dt = new ())
+    public byte CalcTAIMinusUTC(DateTime dt = new ())
     {
-        return (byte)(10 + LeapSecondCount(dt));
+        return (byte)(10 + TotalLeapSeconds(DateOnly.FromDateTime(dt)));
     }
 
     /// <summary>
@@ -446,7 +522,7 @@ public static class TimeScaleService
     /// <param name="dt">A point in time. Defaults to current DateTime.</param>
     /// <returns>The difference between UT1 and UTC.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If year less than 1972.</exception>
-    public static double CalcDUT1(DateTime dt = new ())
+    public double CalcDUT1(DateTime dt = new ())
     {
         return TT_MINUS_TAI - CalcDeltaTNASA(dt) + CalcTAIMinusUTC(dt);
     }
@@ -491,12 +567,12 @@ public static class TimeScaleService
         return JulianDaysSinceJ2000(jdtt) / XTimeSpan.DAYS_PER_JULIAN_MILLENNIUM;
     }
 
-    public static void TestCalcDUT1()
+    public void TestCalcDUT1()
     {
         for (var y = 1972; y <= 2022; y++)
         {
             var dt = new DateTime(y, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            byte LSC = LeapSecondCount(dt);
+            int LSC = TotalLeapSeconds(dt);
             double deltaT = CalcDeltaTNASA(dt);
             double DUT1 = CalcDUT1(dt);
             Console.WriteLine($"Year={y}, LSC={LSC}, ∆T={deltaT}, DUT1={DUT1}");

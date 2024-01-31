@@ -1,5 +1,5 @@
 using Galaxon.Astronomy.Data;
-using Galaxon.Astronomy.Models;
+using Galaxon.Astronomy.Data.Models;
 using Galaxon.Core.Exceptions;
 using Galaxon.Numerics.Algebra;
 using Galaxon.Numerics.Geometry;

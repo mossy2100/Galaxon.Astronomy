@@ -1,5 +1,6 @@
 using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Algorithms;
+using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Numerics.Geometry;
 
 namespace Galaxon.Astronomy.Tests;
@@ -11,6 +12,8 @@ public class TestSun
 
     private AstroObjectRepository? _astroObjectRepository;
 
+    private AstroObjectGroupRepository? _astroObjectGroupRepository;
+
     private EarthService? _earthService;
 
     private PlanetService? _planetService;
@@ -21,11 +24,13 @@ public class TestSun
     public void Init()
     {
         _astroDbContext = new AstroDbContext();
-        _astroObjectRepository = new AstroObjectRepository(_astroDbContext);
+        _astroObjectGroupRepository = new AstroObjectGroupRepository(_astroDbContext);
+        _astroObjectRepository =
+            new AstroObjectRepository(_astroDbContext, _astroObjectGroupRepository);
         _planetService = new PlanetService(_astroDbContext);
         _earthService = new EarthService(_astroObjectRepository, _planetService);
-        _sunService = new SunService(_astroDbContext, _astroObjectRepository, _earthService,
-            _planetService);
+        _sunService = new SunService(_astroDbContext, _astroObjectRepository,
+            _astroObjectGroupRepository, _earthService, _planetService);
     }
 
     [TestMethod]

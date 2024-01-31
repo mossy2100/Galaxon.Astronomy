@@ -1,6 +1,4 @@
-﻿using Galaxon.Core.Strings;
-
-namespace Galaxon.Astronomy.Models;
+﻿namespace Galaxon.Astronomy.Data.Models;
 
 // Main class for astronomical objects.
 // All physical quantities are in SI units.
@@ -130,42 +128,31 @@ public class AstroObject
     }
 
     /// <summary>
-    /// Check if the object is in a certain group.
-    /// </summary>
-    /// <param name="group">The group to check.</param>
-    /// <returns>If the object is in the specified group.</returns>
-    public bool IsInGroup(AstroObjectGroup group)
-    {
-        return Groups?.Contains(group) ?? false;
-    }
-
-    /// <summary>
-    /// Check if the object is in a certain group.
-    /// </summary>
-    /// <param name="groupName">The name of the group to check (case sensitive).</param>
-    /// <returns>If the object is in the specified group.</returns>
-    public bool IsInGroup(string groupName)
-    {
-        return Groups != null && Groups.Any(group => groupName.EqualsIgnoreCase(group.Name));
-    }
-
-    /// <summary>
     /// Convert the object to a string.
     /// </summary>
-    /// <returns>The object name, or the readable designation for minor planets.</returns>
+    /// <returns>The object's name, number, or readable designation.</returns>
     public override string ToString()
     {
+        // Check for a readable designation (minor planets).
         string? readable = MinorPlanet?.ReadableDesignation;
         if (!string.IsNullOrEmpty(readable))
         {
             return readable;
         }
 
-        if (Name != null && Number == null)
+        // Check for a name (planets, satellites, etc.).
+        if (Name != null)
         {
             return Name;
         }
 
-        return $"{Name} ({Number})".Trim();
+        // If there's no name, but there is a number, use that. (What cases?)
+        if (Number != null)
+        {
+            return $"{Number}";
+        }
+
+        // No name or number.
+        throw new InvalidOperationException("Object has neither name nor number.");
     }
 }

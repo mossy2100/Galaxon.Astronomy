@@ -1,11 +1,9 @@
-﻿using Galaxon.Astronomy.Enums;
+﻿using Galaxon.Astronomy.Data.Enums;
 
-namespace Galaxon.Astronomy.Models;
+namespace Galaxon.Astronomy.Data.Models;
 
 public class LunarPhase
 {
-    #region Properties
-
     public int Id { get; set; }
 
     /// <summary>
@@ -23,6 +21,4 @@ public class LunarPhase
     /// </summary>
     [Column(TypeName = "datetime2")]
     public DateTime UtcDateTime { get; set; }
-
-    #endregion Properties
 }
