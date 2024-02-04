@@ -1,4 +1,6 @@
-﻿namespace Galaxon.Astronomy.Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Galaxon.Astronomy.Data.Models;
 
 /// <summary>
 /// Represents a record containing VSOP87D planetary data.
@@ -13,7 +15,7 @@ public class VSOP87DRecord
     /// <summary>
     /// Gets or sets the name of the planet associated with this record.
     /// </summary>
-    [Column(TypeName = "varchar(10)")]
+    [MaxLength(10)]
     public string PlanetName { get; set; } = "";
 
     /// <summary>

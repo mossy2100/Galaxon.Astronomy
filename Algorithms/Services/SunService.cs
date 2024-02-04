@@ -1,12 +1,13 @@
-﻿using Galaxon.Astronomy.Data;
-using Galaxon.Astronomy.Data.Repositories;
+﻿using Galaxon.Astronomy.Algorithms.Utilities;
+using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Data.Models;
+using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Core.Numbers;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 using Galaxon.Quantities;
 
-namespace Galaxon.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms.Services;
 
 public class SunService(
     AstroDbContext astroDbContext,
@@ -170,7 +171,7 @@ public class SunService(
         // Convert to FK5.
         // This gives the true ("geometric") longitude of the Sun referred to the
         // mean equinox of the date.
-        double julCen = JulianDateService.JulianCenturiesSinceJ2000(JD_TT);
+        double julCen = JulianDateUtility.JulianCenturiesSinceJ2000(JD_TT);
         double lambdaPrime = lngSun - Angle.DegToRad(1.397) * julCen
             - Angle.DegToRad(0.000_31) * julCen * julCen;
         lngSun -= Angle.DmsToRad(0, 0, 0.090_33);
@@ -222,8 +223,8 @@ public class SunService(
     /// <returns>The longitude and latitude of the Sun, in radians, at the given instant.</returns>
     public (double Lng, double Lat) CalcPosition(DateTime dt)
     {
-        double JD = JulianDateService.DateTime_to_JulianDate(dt);
-        double JD_TT = JulianDateService.JulianDate_UT_to_TT(JD);
+        double JD = JulianDateUtility.DateTime_to_JulianDate(dt);
+        double JD_TT = JulianDateUtility.JulianDate_UT_to_TT(JD);
         return CalcPosition(JD_TT);
     }
 }

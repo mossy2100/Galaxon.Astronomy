@@ -1,4 +1,6 @@
-﻿namespace Galaxon.Astronomy.Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Galaxon.Astronomy.Data.Models;
 
 public class AstroObjectGroup
 {
@@ -6,10 +8,11 @@ public class AstroObjectGroup
     public int Id { get; set; }
 
     // Group name.
+    [MaxLength(20)]
     public string Name { get; set; } = "";
 
     // Objects in the group (navigation property).
-    public List<AstroObject> Objects { get; set; } = new ();
+    public List<AstroObject> Objects { get; set; } = [];
 
     // Parent group.
     public int? ParentId { get; set; }

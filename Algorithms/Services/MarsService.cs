@@ -1,9 +1,9 @@
-﻿using System.Runtime.InteropServices.ObjectiveC;
-using Galaxon.Astronomy.Data.Repositories;
+﻿using Galaxon.Astronomy.Algorithms.Utilities;
 using Galaxon.Astronomy.Data.Models;
+using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Core.Exceptions;
 
-namespace Galaxon.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms.Services;
 
 /// <summary>
 /// A container for constants and static methods related to Mars.
@@ -46,7 +46,7 @@ public class MarsService(AstroObjectRepository astroObjectRepository, PlanetServ
     /// <returns>The Mars Sol Date.</returns>
     public static double CalcMarsSolDate(double JD_TT)
     {
-        double JD_TAI = JulianDateService.JulianDate_TT_to_TAI(JD_TT);
+        double JD_TAI = JulianDateUtility.JulianDate_TT_to_TAI(JD_TT);
         const double k = 1.0 / 4000;
         double MSD = (JD_TAI - 2451549.5 + k) / (double)DAYS_PER_SOL + 44796.0;
         return MSD;

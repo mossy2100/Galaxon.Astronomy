@@ -1,5 +1,5 @@
 using Galaxon.Astronomy.Data;
-using Galaxon.Astronomy.Algorithms;
+using Galaxon.Astronomy.Algorithms.Services;
 using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Numerics.Geometry;
 

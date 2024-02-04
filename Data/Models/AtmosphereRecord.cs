@@ -30,7 +30,7 @@ public class AtmosphereRecord
     public double? ScaleHeight { get; set; }
 
     // Atmosphere constituents.
-    public List<AtmosphereConstituent> Constituents { get; set; } = new ();
+    public List<AtmosphereConstituent> Constituents { get; set; } = [];
 
     // Is it a surface-bounded exosphere?
     public bool? IsSurfaceBoundedExosphere { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace Galaxon.Astronomy.Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Galaxon.Astronomy.Data.Models;
 
 /// <summary>
 /// Represents information about a stellar object.
@@ -23,6 +25,7 @@ public class StellarRecord
     /// <summary>
     /// Gets or sets the spectral classification of the stellar object.
     /// </summary>
+    [MaxLength(5)]
     public string? SpectralClass { get; set; }
 
     /// <summary>

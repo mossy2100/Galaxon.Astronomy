@@ -2,10 +2,6 @@
 
 namespace Galaxon.Astronomy.Data.Converters;
 
-public class DateTimeConverter : ValueConverter<DateTime, DateTime>
-{
-    public DateTimeConverter() : base(
-        v => v,
-        v => new DateTime(v.Ticks, DateTimeKind.Utc)
-    ) { }
-}
+public class DateTimeConverter() : ValueConverter<DateTime, DateTime>(
+    v => v,
+    v => new DateTime(v.Ticks, DateTimeKind.Utc));

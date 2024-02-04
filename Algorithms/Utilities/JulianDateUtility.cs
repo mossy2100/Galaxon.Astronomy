@@ -1,8 +1,9 @@
+using Galaxon.Astronomy.Algorithms.Services;
 using Galaxon.Core.Time;
 
-namespace Galaxon.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms.Utilities;
 
-public class JulianDateService
+public static class JulianDateUtility
 {
     #region Constants
 

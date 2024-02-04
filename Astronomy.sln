@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithms", "Algorithms\Algorithms.csproj", "{016FBF6C-768B-4AB8-954A-A6A53F3F069E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataImport", "DataImport\DataImport.csproj", "{3A97E9F1-E74F-4977-9733-88DEB0237160}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,5 +52,9 @@ Global
 		{016FBF6C-768B-4AB8-954A-A6A53F3F069E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{016FBF6C-768B-4AB8-954A-A6A53F3F069E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{016FBF6C-768B-4AB8-954A-A6A53F3F069E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A97E9F1-E74F-4977-9733-88DEB0237160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A97E9F1-E74F-4977-9733-88DEB0237160}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A97E9F1-E74F-4977-9733-88DEB0237160}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A97E9F1-E74F-4977-9733-88DEB0237160}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

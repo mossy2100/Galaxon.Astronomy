@@ -1,4 +1,6 @@
-﻿namespace Galaxon.Astronomy.Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Galaxon.Astronomy.Data.Models;
 
 public class MinorPlanetRecord
 {
@@ -11,9 +13,11 @@ public class MinorPlanetRecord
     public AstroObject? AstroObject { get; set; }
 
     // The designation in packed form.
+    [MaxLength(30)]
     public string PackedDesignation { get; set; } = "";
 
     // The designation in readable form.
+    [MaxLength(30)]
     public string ReadableDesignation { get; set; } = "";
 
     // Date/time of periapsis (minor planets).
@@ -34,8 +38,10 @@ public class MinorPlanetRecord
     public AstroObject? CoOrbitalObject { get; set; }
 
     // Tholen spectral type.
+    [MaxLength(10)]
     public string? Tholen { get; set; }
 
     // SMASS spectral type.
+    [MaxLength(10)]
     public string? SMASS { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using Galaxon.Astronomy.Algorithms;
+﻿using Galaxon.Astronomy.Algorithms.Services;
 
 namespace Galaxon.Astronomy;
 
@@ -20,24 +20,14 @@ public class Program
             double deltaTNasa = TimeScaleService.CalcDeltaTNASA(y);
             double deltaTMeeus = TimeScaleService.CalcDeltaTMeeus(y);
             double diff = Abs(deltaTMeeus - deltaTNasa);
-            string grade;
 
-            if (diff < 1)
+            string grade = diff switch
             {
-                grade = "VERY GOOD";
-            }
-            else if (diff < 10)
-            {
-                grade = "GOOD";
-            }
-            else if (diff < 100)
-            {
-                grade = "MEH";
-            }
-            else
-            {
-                grade = "BAD";
-            }
+                < 1 => "VERY GOOD",
+                < 10 => "GOOD",
+                < 100 => "MEH",
+                _ => "BAD"
+            };
 
             writer.WriteLine($"{y,-10}{deltaTNasa,-25}{deltaTMeeus,-25}{diff,-25}{grade,-25}");
         }

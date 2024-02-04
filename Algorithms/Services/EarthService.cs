@@ -1,10 +1,10 @@
-﻿using Galaxon.Astronomy.Data.Repositories;
+﻿using Galaxon.Astronomy.Algorithms.Utilities;
 using Galaxon.Astronomy.Data.Models;
+using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Core.Exceptions;
-using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 
-namespace Galaxon.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms.Services;
 
 /// <summary>
 /// This is a static class containing useful methods and constants relating to Earth.
@@ -42,7 +42,7 @@ public class EarthService(AstroObjectRepository astroObjectRepository, PlanetSer
     /// <returns>The Earth Rotation Angle.</returns>
     public static double CalcEarthRotationAngle(double JD)
     {
-        double t = JulianDateService.JulianDaysSinceJ2000(JD);
+        double t = JulianDateUtility.JulianDaysSinceJ2000(JD);
         double radians = Tau * (0.779_057_273_264 + 1.002_737_811_911_354_48 * t);
         return Angle.NormalizeRadians(radians);
     }
@@ -54,7 +54,7 @@ public class EarthService(AstroObjectRepository astroObjectRepository, PlanetSer
     /// <returns>The ERA at the given instant.</returns>
     public static double CalcEarthRotationAngle(DateTime dt)
     {
-        double JD = JulianDateService.DateTime_to_JulianDate(dt);
+        double JD = JulianDateUtility.DateTime_to_JulianDate(dt);
         return CalcEarthRotationAngle(JD);
     }
 

@@ -1,8 +1,8 @@
 ﻿using Galaxon.Astronomy.Data;
 using Galaxon.Astronomy.Data.Models;
-using Galaxon.Astronomy.Algorithms;
+using Galaxon.Astronomy.Algorithms.Services;
+using Galaxon.Astronomy.Algorithms.Utilities;
 using Galaxon.Astronomy.Data.Repositories;
-using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 using Galaxon.Quantities;
 
@@ -88,10 +88,10 @@ public class TestPlanets
             return;
         }
         var dt_TT = new DateTime(1999, 7, 26, 0, 0, 0, DateTimeKind.Utc);
-        double JD_TT = JulianDateService.DateTime_to_JulianDate(dt_TT);
+        double JD_TT = JulianDateUtility.DateTime_to_JulianDate(dt_TT);
 
         // Act.
-        (double actualL, double B, double R) = _planetService!.CalcPlanetPosition(saturn, JD_TT);
+        (double actualL, double _, double _) = _planetService!.CalcPlanetPosition(saturn, JD_TT);
 
         // Assert.
         double expectedL = Angle.DegToRad(39.972_3901);

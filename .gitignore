@@ -357,5 +357,4 @@ riderModule.iml
 Repository/data
 
 # Minor planets data
-MPCORB.DAT
-mpcorb_extended.dat
+**/data/Minor planets/*

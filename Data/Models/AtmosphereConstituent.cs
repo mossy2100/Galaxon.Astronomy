@@ -18,7 +18,7 @@ public class AtmosphereConstituent
     /// <summary>
     /// Gets or sets the reference to the parent AtmosphereRecord object.
     /// </summary>
-    public AtmosphereRecord Atmosphere { get; set; } = new AtmosphereRecord();
+    public AtmosphereRecord Atmosphere { get; set; } = new ();
 
     /// <summary>
     /// Gets or sets the link to the gas molecule.
@@ -28,7 +28,7 @@ public class AtmosphereConstituent
     /// <summary>
     /// Gets or sets the reference to the gas molecule.
     /// </summary>
-    public Molecule Molecule { get; set; } = new Molecule();
+    public Molecule Molecule { get; set; } = new ();
 
     /// <summary>
     /// Gets or sets the percentage of the gas in the atmosphere by volume.

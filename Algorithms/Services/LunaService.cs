@@ -1,11 +1,12 @@
-using Galaxon.Astronomy.Data.Repositories;
+using Galaxon.Astronomy.Algorithms.Utilities;
 using Galaxon.Astronomy.Data.Enums;
 using Galaxon.Astronomy.Data.Models;
+using Galaxon.Astronomy.Data.Repositories;
 using Galaxon.Core.Exceptions;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Geometry;
 
-namespace Galaxon.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms.Services;
 
 /// <summary>
 /// Calling this class LunaService as there was some earlier confusion with the word "moon"
@@ -38,7 +39,8 @@ public class LunaService(AstroObjectRepository astroObjectRepository)
         {
             AstroObject? luna = astroObjectRepository.Load("Luna", "planet");
             _luna = luna
-                ?? throw new DataNotFoundException("Could not find the Moon (Luna) in the database.");
+                ?? throw new DataNotFoundException(
+                    "Could not find the Moon (Luna) in the database.");
         }
 
         return _luna;
@@ -65,9 +67,9 @@ public class LunaService(AstroObjectRepository astroObjectRepository)
         // I might have overdone it here on attempting to maximise precision for this calculation.
         // Testing will confirm.
         DateTime dtPhaseApprox = LUNATION_0_START.AddDays(k * XTimeSpan.DAYS_PER_LUNATION);
-        double JD = JulianDateService.DateTime_to_JulianDate(dtPhaseApprox);
-        double JD_TT = JulianDateService.JulianDate_UT_to_TT(JD);
-        double T = JulianDateService.JulianCenturiesSinceJ2000(JD_TT);
+        double JD = JulianDateUtility.DateTime_to_JulianDate(dtPhaseApprox);
+        double JD_TT = JulianDateUtility.JulianDate_UT_to_TT(JD);
+        double T = JulianDateUtility.JulianCenturiesSinceJ2000(JD_TT);
         double T2 = T * T;
         double T3 = T * T2;
         double T4 = T * T3;
@@ -216,8 +218,8 @@ public class LunaService(AstroObjectRepository astroObjectRepository)
         JDE += C1 + C2;
 
         // Convert the JDE to a UTC DateTime.
-        JD = JulianDateService.JulianDate_TT_to_UT(JDE);
-        DateTime dtPhase = JulianDateService.JulianDate_to_DateTime(JD);
+        JD = JulianDateUtility.JulianDate_TT_to_UT(JDE);
+        DateTime dtPhase = JulianDateUtility.JulianDate_to_DateTime(JD);
 
         // Construct and return the LunarPhase object.
         return new LunarPhase { PhaseNumber = phaseType, UtcDateTime = dtPhase };
@@ -273,10 +275,10 @@ public class LunaService(AstroObjectRepository astroObjectRepository)
 
     /// <summary>
     /// Get the DateTimes of all occurrences of the specified phase in a given Gregorian calendar
-    /// year.
+    /// year (UTC).
     /// </summary>
     /// <param name="year">The year number.</param>
-    /// <returns></returns>
+    /// <returns>A list of lunar phases.</returns>
     public List<LunarPhase> PhasesInYear(int year)
     {
         // Check year is valid. Valid range matches DateTime.IsLeapYear().
@@ -286,6 +288,7 @@ public class LunaService(AstroObjectRepository astroObjectRepository)
                 "Year must be in the range 1..9999");
         }
 
-        return PhasesInPeriod(XDateTime.GetYearStart(year), XDateTime.GetYearEnd(year));
+        return PhasesInPeriod(XGregorianCalendar.YearStart(year, DateTimeKind.Utc),
+            XGregorianCalendar.YearEnd(year, DateTimeKind.Utc));
     }
 }

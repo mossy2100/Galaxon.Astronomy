@@ -1,4 +1,6 @@
-﻿namespace Galaxon.Astronomy.Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Galaxon.Astronomy.Data.Models;
 
 public class Molecule
 {
@@ -6,9 +8,11 @@ public class Molecule
     public int Id { get; set; }
 
     // Name.
+    [MaxLength(50)]
     public string Name { get; set; } = "";
 
     // Chemical symbol.
+    [MaxLength(20)]
     public string Symbol { get; set; } = "";
 
     /// <summary>

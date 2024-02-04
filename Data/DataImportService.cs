@@ -10,7 +10,7 @@ using Galaxon.Core.Time;
 
 namespace Galaxon.Astronomy.Data;
 
-public class ImportData(
+public class DataImportService(
     AstroDbContext astroDbContext,
     AstroObjectRepository astroObjectRepository,
     AstroObjectGroupRepository astroObjectGroupRepository)
@@ -19,10 +19,8 @@ public class ImportData(
     /// Parse the data file from the US Census Bureau.
     /// </summary>
     /// <see href="https://www.census.gov/data/software/x13as/genhol/easter-dates.html"/>
-    private static void ParseEasterDates1600_2099()
+    private void ParseEasterDates1600_2099()
     {
-        using AstroDbContext db = new ();
-
         var csvFile =
             $"{AstroDbContext.DataDirectory()}/Easter/Easter Sunday Dates 1600-2099.csv";
         using StreamReader reader = new (csvFile);
@@ -49,7 +47,7 @@ public class ImportData(
                 DateOnly newEasterDate = new (year, month, day);
 
                 // See if we already have one for this year.
-                EasterDate? existingEasterDate = db.EasterDates
+                EasterDate? existingEasterDate = astroDbContext.EasterDates
                     .FirstOrDefault(ed => ed.Date.Year == year);
 
                 // Add or update the record as needed.
@@ -57,7 +55,7 @@ public class ImportData(
                 {
                     // Add a record.
                     Console.WriteLine($"Adding new Easter date {newEasterDate}");
-                    db.EasterDates.Add(new EasterDate { Date = newEasterDate });
+                    astroDbContext.EasterDates.Add(new EasterDate { Date = newEasterDate });
                 }
                 else if (existingEasterDate.Date != newEasterDate)
                 {
@@ -77,17 +75,15 @@ public class ImportData(
             }
         }
 
-        db.SaveChanges();
+        astroDbContext.SaveChanges();
     }
 
     /// <summary>
     /// Parse the data file from the Astronomical Society of South Australia.
     /// </summary>
     /// <see href="https://www.assa.org.au/edm"/>
-    private static void ParseEasterDates1700_2299()
+    private void ParseEasterDates1700_2299()
     {
-        using AstroDbContext db = new ();
-
         var htmlFile =
             $"{AstroDbContext.DataDirectory()}/Easter/Easter Sunday Dates 1700-2299.html";
         Regex rx = new (@"(\d{1,2})(st|nd|rd|th) (March|April) (\d{4})");
@@ -113,11 +109,11 @@ public class ImportData(
                 var day = int.Parse(match.Groups[1].Value);
                 DateOnly newEasterDate = new (year, month, day);
                 // See if we already have one for this year.
-                EasterDate? existingEasterDate = db.EasterDates
+                EasterDate? existingEasterDate = astroDbContext.EasterDates
                     .FirstOrDefault(ed => ed.Date.Year == year);
                 if (existingEasterDate == null)
                 {
-                    db.EasterDates.Add(new EasterDate { Date = newEasterDate });
+                    astroDbContext.EasterDates.Add(new EasterDate { Date = newEasterDate });
                 }
                 else
                 {
@@ -136,7 +132,7 @@ public class ImportData(
             }
         }
 
-        db.SaveChanges();
+        astroDbContext.SaveChanges();
     }
 
     /// <summary>
@@ -151,7 +147,7 @@ public class ImportData(
         int? year = null;
         string? curYearStr = null;
 
-        using AstroDbContext db = new ();
+        using AstroDbContext astroDbContext = new ();
 
         for (var century = 0; century < 20; century++)
         {
@@ -199,14 +195,14 @@ public class ImportData(
                         phaseDateTime = DateTime.SpecifyKind(phaseDateTime, DateTimeKind.Utc);
 
                         // Store phase information in the database.
-                        if (db.LunarPhases != null)
+                        if (astroDbContext.LunarPhases != null)
                         {
-                            db.LunarPhases.Add(new LunarPhase
+                            astroDbContext.LunarPhases.Add(new LunarPhase
                             {
                                 PhaseNumber = (ELunarPhase)phase,
                                 UtcDateTime = phaseDateTime
                             });
-                            db.SaveChanges();
+                            astroDbContext.SaveChanges();
                         }
                     }
                 }
@@ -219,8 +215,6 @@ public class ImportData(
     /// </summary>
     public void InitializeAstroObjects()
     {
-        using AstroDbContext db = new ();
-
         // Stars.
         AstroObjectGroup star = astroObjectGroupRepository.CreateOrUpdate("Star");
         astroObjectGroupRepository.CreateOrUpdate("Hypergiant", star);
@@ -311,8 +305,6 @@ public class ImportData(
     /// </summary>
     public void InitializePlanets()
     {
-        using AstroDbContext db = new ();
-
         // Get the Sun.
         var sun = astroObjectRepository.Load("Sun");
 
@@ -342,13 +334,13 @@ public class ImportData(
                 // Create a new planet in the database.
                 Console.WriteLine($"Adding new planet {name}.");
                 planet = new AstroObject(name);
-                db.AstroObjects.Add(planet);
+                astroDbContext.AstroObjects.Add(planet);
             }
             else
             {
                 // Update planet in the database.
                 Console.WriteLine($"Updating planet {name}.");
-                db.AstroObjects.Attach(planet);
+                astroDbContext.AstroObjects.Attach(planet);
             }
 
             // Set the planet's basic parameters.
@@ -366,7 +358,7 @@ public class ImportData(
 
             // Save the planet object now to ensure it has an Id before attaching composition
             // objects to it.
-            db.SaveChanges();
+            astroDbContext.SaveChanges();
 
             // Orbital parameters.
             // TODO Fix this. The Orbit and other objects aren't loaded by
@@ -414,7 +406,7 @@ public class ImportData(
             planet.Orbit.MeanMotion = Tau / planet.Orbit.SiderealOrbitPeriod;
 
             // Save the orbital parameters.
-            db.SaveChanges();
+            astroDbContext.SaveChanges();
 
             // Physical parameters.
             planet.Physical ??= new PhysicalRecord();
@@ -439,7 +431,7 @@ public class ImportData(
             planet.Physical.MinSurfaceTemp = csv.GetField(36).ToDouble();
             planet.Physical.MeanSurfaceTemp = csv.GetField(37).ToDouble();
             planet.Physical.MaxSurfaceTemp = csv.GetField(38).ToDouble();
-            db.SaveChanges();
+            astroDbContext.SaveChanges();
 
             // Rotational parameters.
             planet.Rotation ??= new RotationalRecord();
@@ -453,14 +445,14 @@ public class ImportData(
                 csv.GetField(34).ToDouble() * Angle.RadiansPerDegree;
             planet.Rotation.NorthPoleDeclination =
                 csv.GetField(35).ToDouble() * Angle.RadiansPerDegree;
-            db.SaveChanges();
+            astroDbContext.SaveChanges();
 
             // Atmosphere.
             planet.Atmosphere ??= new AtmosphereRecord();
             planet.Atmosphere.SurfacePressure = csv.GetField(40).ToDouble();
             planet.Atmosphere.ScaleHeight = csv.GetField(41).ToDouble() * kilo;
             planet.Atmosphere.IsSurfaceBoundedExosphere = name == "Mercury";
-            db.SaveChanges();
+            astroDbContext.SaveChanges();
         }
     }
 
@@ -470,7 +462,7 @@ public class ImportData(
     /// </summary>
     public static void ParseSeasonalMarkerData()
     {
-        using AstroDbContext db = new ();
+        using AstroDbContext astroDbContext = new ();
 
         // Lookup table to help with the parsing.
         Dictionary<string, int> MonthAbbrevs = new ()
@@ -515,14 +507,14 @@ public class ImportData(
 
                 // Check if there is already an entry in the database table
                 // for this seasonal marker.
-                SeasonalMarker? sm = db.SeasonalMarkers?
+                SeasonalMarker? sm = astroDbContext.SeasonalMarkers?
                     .FirstOrDefault(sm => sm.UtcDateTime.Year == year && sm.MarkerNumber == i);
 
                 // Add a new row or update the existing row as required.
                 if (sm == null)
                 {
                     // Add a new row.
-                    db.SeasonalMarkers!.Add(new SeasonalMarker
+                    astroDbContext.SeasonalMarkers!.Add(new SeasonalMarker
                     {
                         MarkerNumber = i,
                         UtcDateTime = seasonalMarkerDateTime
@@ -536,7 +528,7 @@ public class ImportData(
             }
         }
 
-        db.SaveChanges();
+        astroDbContext.SaveChanges();
     }
 
     /// <summary>
@@ -549,8 +541,6 @@ public class ImportData(
     /// <param name="fileName">The name of the data file.</param>
     public void ParseVSOP87DataFile(string fileName)
     {
-        using AstroDbContext db = new ();
-
         // Get the data from the data file as an array of strings.
         var dataFilePath = $"{AstroDbContext.DataDirectory()}/VSOP87/{fileName}";
         using StreamReader sr = new (dataFilePath);
@@ -635,14 +625,14 @@ public class ImportData(
             Console.WriteLine($"Frequency = {frequency}");
 
             // Look for an existing record.
-            VSOP87DRecord? record = db.VSOP87DRecords.FirstOrDefault(record =>
+            VSOP87DRecord? record = astroDbContext.VSOP87DRecords.FirstOrDefault(record =>
                 record.AstroObjectId == planet.Id && record.Variable == variable &&
                 record.Exponent == exponent && record.Index == index);
             if (record == null)
             {
                 // Add a new record.
                 Console.WriteLine("Adding new record.");
-                db.VSOP87DRecords.Add(new VSOP87DRecord
+                astroDbContext.VSOP87DRecords.Add(new VSOP87DRecord
                 {
                     AstroObjectId = planet.Id,
                     Variable = variable,
@@ -652,7 +642,7 @@ public class ImportData(
                     Phase = phase,
                     Frequency = frequency
                 });
-                db.SaveChanges();
+                astroDbContext.SaveChanges();
             }
             else if (!record.Amplitude.FuzzyEquals(amplitude) || !record.Phase.FuzzyEquals(phase)
                 || !record.Frequency.FuzzyEquals(frequency))
@@ -662,7 +652,7 @@ public class ImportData(
                 record.Amplitude = amplitude;
                 record.Phase = phase;
                 record.Frequency = frequency;
-                db.SaveChanges();
+                astroDbContext.SaveChanges();
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿using Galaxon.Astronomy.Data.Enums;
-using Galaxon.Astronomy.Algorithms;
+using Galaxon.Astronomy.Algorithms.Services;
 using Galaxon.Core.Testing;
 
 namespace Galaxon.Astronomy.Tests;

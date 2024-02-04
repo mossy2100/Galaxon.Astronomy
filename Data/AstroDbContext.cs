@@ -1,5 +1,6 @@
 ﻿using Galaxon.Astronomy.Data.Converters;
 using Galaxon.Astronomy.Data.Models;
+using Galaxon.Core.Files;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -15,12 +16,17 @@ public class AstroDbContext : DbContext
     /// </summary>
     public AstroDbContext() { }
 
-    /// <summary>
-    /// AstroObjects types.
-    /// </summary>
+    #region Database tables
+
+    // ---------------------------------------------------------------------------------------------
+    // Astronomical objects and groups.
+
     public DbSet<AstroObject> AstroObjects => Set<AstroObject>();
 
     public DbSet<AstroObjectGroup> AstroObjectGroups => Set<AstroObjectGroup>();
+
+    // ---------------------------------------------------------------------------------------------
+    // AstroObject classes. (Obsolete)
 
     // public DbSet<Star> Stars => Set<Star>();
     //
@@ -30,9 +36,9 @@ public class AstroDbContext : DbContext
     //
     // public DbSet<Moon> Moons => Set<Moon>();
 
-    /// <summary>
-    /// AstroObject components.
-    /// </summary>
+    // ---------------------------------------------------------------------------------------------
+    // AstroObject components.
+
     public DbSet<PhysicalRecord> PhysicalRecords => Set<PhysicalRecord>();
 
     public DbSet<RotationalRecord> RotationalRecords => Set<RotationalRecord>();
@@ -43,18 +49,25 @@ public class AstroDbContext : DbContext
 
     public DbSet<StellarRecord> StellarRecords => Set<StellarRecord>();
 
+    // ---------------------------------------------------------------------------------------------
+    // Atmospheres.
+
     public DbSet<AtmosphereRecord> AtmosphereRecords => Set<AtmosphereRecord>();
 
-    /// <summary>
-    /// Atmosphere constituents.
-    /// </summary>
     public DbSet<AtmosphereConstituent> AtmosphereConstituents => Set<AtmosphereConstituent>();
 
     public DbSet<Molecule> Molecules => Set<Molecule>();
 
-    /// <summary>
-    /// Other stuff.
-    /// </summary>
+    // ---------------------------------------------------------------------------------------------
+    // Leap seconds.
+
+    public DbSet<LeapSecond> LeapSeconds => Set<LeapSecond>();
+
+    public DbSet<IersBulletinC> IersBulletinCs => Set<IersBulletinC>();
+
+    // ---------------------------------------------------------------------------------------------
+    // Other stuff.
+
     public DbSet<SeasonalMarker> SeasonalMarkers => Set<SeasonalMarker>();
 
     public DbSet<LunarPhase> LunarPhases => Set<LunarPhase>();
@@ -65,16 +78,17 @@ public class AstroDbContext : DbContext
 
     public DbSet<VSOP87DRecord> VSOP87DRecords => Set<VSOP87DRecord>();
 
-    public DbSet<LeapSecond> LeapSeconds => Set<LeapSecond>();
+    // public DbSet<MinorPlanetRecord> MinorPlanetRecords => Set<MinorPlanetRecord>();
 
-    public DbSet<MinorPlanetRecord> MinorPlanetRecords => Set<MinorPlanetRecord>();
+    #endregion Database tables
+
+    public const string ConnectionString =
+        "Server=localhost,1433; Database=Astro; User Id=SA; Password=HappyHealthyRichFree!; Encrypt=False";
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
-            .UseSqlServer(
-                "Server=localhost,1433; Database=TimeAndSpace; User Id=SA; Password=$HappyHealthyRich$; Encrypt=False",
-                options => options.EnableRetryOnFailure())
+            .UseSqlServer(ConnectionString, options => options.EnableRetryOnFailure())
             .LogTo(Console.WriteLine, new[]
             {
                 DbLoggerCategory.Database.Command.Name
@@ -116,10 +130,10 @@ public class AstroDbContext : DbContext
             .HasOne(ao => ao.Stellar)
             .WithOne(ss => ss.AstroObject)
             .HasForeignKey<StellarRecord>(ss => ss.AstroObjectId);
-        builder.Entity<AstroObject>()
-            .HasOne(ao => ao.MinorPlanet)
-            .WithOne(mpr => mpr.AstroObject)
-            .HasForeignKey<MinorPlanetRecord>(mpr => mpr.AstroObjectId);
+        // builder.Entity<AstroObject>()
+        //     .HasOne(ao => ao.MinorPlanet)
+        //     .WithOne(mpr => mpr.AstroObject)
+        //     .HasForeignKey<MinorPlanetRecord>(mpr => mpr.AstroObjectId);
         builder.Entity<AstroObject>()
             .HasMany(ao => ao.VSOP87DRecords)
             .WithOne(vr => vr.AstroObject)
@@ -134,10 +148,22 @@ public class AstroDbContext : DbContext
         configurationBuilder
             .Properties<DateTime>()
             .HaveConversion<DateTimeConverter>();
+        configurationBuilder
+            .Properties<DateOnly?>()
+            .HaveConversion<NullableDateOnlyConverter>();
+        configurationBuilder
+            .Properties<DateTime>()
+            .HaveConversion<NullableDateTimeConverter>();
     }
 
     public static string DataDirectory()
     {
-        return @"/Users/shaun/Documents/Web & software development/C#/Projects/Data";
+        string? solnDir = XDirectory.GetSolutionDirectory();
+        if (solnDir == null)
+        {
+            throw new InvalidOperationException("Solution directory not found.");
+        }
+
+        return Path.Combine(solnDir, "Data/data");
     }
 }

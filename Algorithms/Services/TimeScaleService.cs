@@ -4,7 +4,7 @@ using Galaxon.Core.Exceptions;
 using Galaxon.Core.Time;
 using Galaxon.Numerics.Algebra;
 
-namespace Galaxon.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms.Services;
 
 public class TimeScaleService(LeapSecondRepository leapSecondRepository)
 {
@@ -13,6 +13,51 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     /// TT = TAI + 32,184 ms
     /// </summary>
     public const int TT_MINUS_TAI_MS = 32_184 /* milliseconds */;
+
+    /// <summary>
+    /// Copy of Table 10A in Astronomical Algorithms 2nd Ed. by Jean Meeus.
+    /// </summary>
+    private static readonly Dictionary<int, double> DeltaTData = new()
+    {
+        { 1620, 121.0 }, { 1622, 112.0 }, { 1624, 103.0 }, { 1626, 95.0 }, { 1628, 88.0 },
+        { 1630, 82.0 }, { 1632, 77.0 }, { 1634, 72.0 }, { 1636, 68.0 }, { 1638, 63.0 },
+        { 1640, 60.0 }, { 1642, 56.0 }, { 1644, 53.0 }, { 1646, 51.0 }, { 1648, 48.0 },
+        { 1650, 46.0 }, { 1652, 44.0 }, { 1654, 42.0 }, { 1656, 40.0 }, { 1658, 38.0 },
+        { 1660, 35.0 }, { 1662, 33.0 }, { 1664, 31.0 }, { 1666, 29.0 }, { 1668, 26.0 },
+        { 1670, 24.0 }, { 1672, 22.0 }, { 1674, 20.0 }, { 1676, 18.0 }, { 1678, 16.0 },
+        { 1680, 14.0 }, { 1682, 12.0 }, { 1684, 11.0 }, { 1686, 10.0 }, { 1688, 9.0 },
+        { 1690, 8.0 }, { 1692, 7.0 }, { 1694, 7.0 }, { 1696, 7.0 }, { 1698, 7.0 },
+        { 1700, 7.0 }, { 1702, 7.0 }, { 1704, 8.0 }, { 1706, 8.0 }, { 1708, 9.0 },
+        { 1710, 9.0 }, { 1712, 9.0 }, { 1714, 9.0 }, { 1716, 9.0 }, { 1718, 10.0 },
+        { 1720, 10.0 }, { 1722, 10.0 }, { 1724, 10.0 }, { 1726, 10.0 }, { 1728, 10.0 },
+        { 1730, 10.0 }, { 1732, 10.0 }, { 1734, 11.0 }, { 1736, 11.0 }, { 1738, 11.0 },
+        { 1740, 11.0 }, { 1742, 11.0 }, { 1744, 12.0 }, { 1746, 12.0 }, { 1748, 12.0 },
+        { 1750, 12.0 }, { 1752, 13.0 }, { 1754, 13.0 }, { 1756, 13.0 }, { 1758, 14.0 },
+        { 1760, 14.0 }, { 1762, 14.0 }, { 1764, 14.0 }, { 1766, 15.0 }, { 1768, 15.0 },
+        { 1770, 15.0 }, { 1772, 15.0 }, { 1774, 15.0 }, { 1776, 16.0 }, { 1778, 16.0 },
+        { 1780, 16.0 }, { 1782, 16.0 }, { 1784, 16.0 }, { 1786, 16.0 }, { 1788, 16.0 },
+        { 1790, 16.0 }, { 1792, 15.0 }, { 1794, 15.0 }, { 1796, 14.0 }, { 1798, 13.0 },
+        { 1800, 13.1 }, { 1802, 12.5 }, { 1804, 12.2 }, { 1806, 12.0 }, { 1808, 12.0 },
+        { 1810, 12.0 }, { 1812, 12.0 }, { 1814, 12.0 }, { 1816, 12.0 }, { 1818, 11.9 },
+        { 1820, 11.6 }, { 1822, 11.0 }, { 1824, 10.2 }, { 1826, 9.2 }, { 1828, 8.2 },
+        { 1830, 7.1 }, { 1832, 6.2 }, { 1834, 5.6 }, { 1836, 5.4 }, { 1838, 5.3 },
+        { 1840, 5.4 }, { 1842, 5.6 }, { 1844, 5.9 }, { 1846, 6.2 }, { 1848, 6.5 },
+        { 1850, 6.8 }, { 1852, 7.1 }, { 1854, 7.3 }, { 1856, 7.5 }, { 1858, 7.6 },
+        { 1860, 7.7 }, { 1862, 7.3 }, { 1864, 6.2 }, { 1866, 5.2 }, { 1868, 2.7 },
+        { 1870, 1.4 }, { 1872, -1.2 }, { 1874, -2.8 }, { 1876, -3.8 }, { 1878, -4.8 },
+        { 1880, -5.5 }, { 1882, -5.3 }, { 1884, -5.6 }, { 1886, -5.7 }, { 1888, -5.9 },
+        { 1890, -6.0 }, { 1892, -6.3 }, { 1894, -6.5 }, { 1896, -6.2 }, { 1898, -4.7 },
+        { 1900, -2.8 }, { 1902, -0.1 }, { 1904, 2.6 }, { 1906, 5.3 }, { 1908, 7.7 },
+        { 1910, 10.4 }, { 1912, 13.3 }, { 1914, 16.0 }, { 1916, 18.2 }, { 1918, 20.2 },
+        { 1920, 21.1 }, { 1922, 22.4 }, { 1924, 23.5 }, { 1926, 23.8 }, { 1928, 24.3 },
+        { 1930, 24.0 }, { 1932, 23.9 }, { 1934, 23.9 }, { 1936, 23.7 }, { 1938, 24.0 },
+        { 1940, 24.3 }, { 1942, 25.3 }, { 1944, 26.2 }, { 1946, 27.3 }, { 1948, 28.2 },
+        { 1950, 29.1 }, { 1952, 30.0 }, { 1954, 30.7 }, { 1956, 31.4 }, { 1958, 32.2 },
+        { 1960, 33.1 }, { 1962, 34.0 }, { 1964, 35.0 }, { 1966, 36.5 }, { 1968, 38.3 },
+        { 1970, 40.2 }, { 1972, 42.2 }, { 1974, 44.5 }, { 1976, 46.5 }, { 1978, 48.5 },
+        { 1980, 50.5 }, { 1982, 52.2 }, { 1984, 53.8 }, { 1986, 54.9 }, { 1988, 55.8 },
+        { 1990, 56.9 }, { 1992, 58.3 }, { 1994, 60.0 }, { 1996, 61.6 }, { 1998, 63.0 }
+    };
 
     /// <summary>
     /// Converts a Gregorian date into a single value representing the year with a fractional
@@ -110,10 +155,10 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     /// <returns>The calculated value for ∆T.</returns>
     public static double CalcDeltaTNASA(double y)
     {
-        double u, deltaT;
+        double deltaT;
 
         // Get the year as an integer.
-        int year = (int)Floor(y);
+        var year = (int)Floor(y);
 
         // Calculate deltaT.
         switch (year)
@@ -140,8 +185,7 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
                 break;
 
             case > 500 and <= 1600:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     1574.2,
                     -556.01,
                     71.23472,
@@ -149,33 +193,30 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
                     -0.8503463,
                     -0.005050998,
                     0.0083572073
-                }, (y - 1000) / 100);
+                ], (y - 1000) / 100);
                 break;
 
             case > 1600 and <= 1700:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     120,
                     -0.9808,
                     -0.01532,
                     1.0 / 7129
-                }, y - 1600);
+                ], y - 1600);
                 break;
 
             case > 1700 and <= 1800:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     8.83,
                     0.1603,
                     -0.0059285,
                     0.00013336,
                     -1.0 / 1174000
-                }, y - 1700);
+                ], y - 1700);
                 break;
 
             case > 1800 and <= 1860:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     13.72,
                     -0.332447,
                     0.0068612,
@@ -184,85 +225,78 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
                     0.0000121272,
                     -0.0000001699,
                     0.000000000875
-                }, y - 1800);
+                ], y - 1800);
                 break;
 
             case > 1860 and <= 1900:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     7.62,
                     0.5737,
                     -0.251754,
                     0.01680668,
                     -0.0004473624,
                     1.0 / 233174
-                }, y - 1860);
+                ], y - 1860);
                 break;
 
             case > 1900 and <= 1920:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     -2.79,
                     1.494119,
                     -0.0598939,
                     0.0061966,
                     -0.000197
-                }, y - 1900);
+                ], y - 1900);
                 break;
 
             case > 1920 and <= 1941:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     21.20,
                     0.84493,
                     -0.0761,
                     0.0020936
-                }, y - 1920);
+                ], y - 1920);
                 break;
 
             case > 1941 and <= 1961:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     29.07,
                     0.407,
                     -1.0 / 233,
                     1.0 / 2547
-                }, y - 1950);
+                ], y - 1950);
                 break;
 
             case > 1961 and <= 1986:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     45.45,
                     1.067,
                     -1.0 / 260,
                     -1.0 / 718
-                }, y - 1975);
+                ], y - 1975);
                 break;
 
             case > 1986 and <= 2005:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     63.86,
                     0.3345,
                     -0.060374,
                     0.0017275,
                     0.000651814,
                     0.00002373599
-                }, y - 2000);
+                ], y - 2000);
                 break;
 
             case > 2005 and <= 2050:
-                deltaT = Polynomials.EvaluatePolynomial(new[]
-                {
+                deltaT = Polynomials.EvaluatePolynomial([
                     62.92,
                     0.32217,
                     0.005589
-                }, y - 2000);
+                ], y - 2000);
                 break;
 
             case > 2050 and <= 2150:
-                u = (y - 1820) / 100;
+                double u = (y - 1820) / 100;
                 deltaT = -20 + 32 * u * u - 0.5628 * (2150 - y);
                 break;
         }
@@ -292,7 +326,7 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     public static double CalcDeltaTMeeus(double y)
     {
         // Get the year as an int.
-        int year = (int)Floor(y);
+        var year = (int)Floor(y);
 
         // Calculate deltaT.
         double deltaT;
@@ -316,7 +350,7 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
             case >= 1620 and < 2000:
                 // Get the value from the lookup table for the even years before and after, and
                 // interpolate.
-                int year1 = (int)(Floor(y / 2) * 2);
+                var year1 = (int)(Floor(y / 2) * 2);
                 int year2 = year1 + 2;
                 double deltaT1 = DeltaTData[year1];
                 double deltaT2 = year2 == 2000 ? CalcDeltaTMeeus(year2) : DeltaTData[year2];
@@ -369,19 +403,13 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     /// <returns>The total value of leap seconds inserted.</returns>
     public int TotalLeapSeconds(DateOnly d)
     {
-        int total = 0;
+        var total = 0;
         foreach (LeapSecond ls in leapSecondRepository.List)
         {
-            // This should always be false, but we should check.
-            if (ls.LeapSecondDate == null)
-            {
-                continue;
-            }
-
             // If the leap second date is earlier than or equal to the date argument, add the value
             // of the leap second (-1, 0, or 1). We're assuming that we want the total leap seconds
             // up to the very end of the given date.
-            if (ls.LeapSecondDate.Value <= d)
+            if (ls.LeapSecondDate <= d)
             {
                 total += ls.Value;
             }
@@ -400,19 +428,13 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     /// <returns>The total value of leap seconds inserted.</returns>
     public int TotalLeapSeconds(DateTime dt)
     {
-        int total = 0;
+        var total = 0;
         foreach (LeapSecond ls in leapSecondRepository.List)
         {
-            // This should always be false, but we should check.
-            if (ls.LeapSecondDate == null)
-            {
-                continue;
-            }
-
             // Get the datetime of the leap second.
             // When creating the new DateTime we use the same DateTimeKind as the argument so the
             // comparison works correctly. The time of day will be set to 00:00:00.
-            DateTime dtLeapSecond = ls.LeapSecondDate.Value.ToDateTime(dt.Kind);
+            var dtLeapSecond = ls.LeapSecondDate.ToDateTime(dt.Kind);
             // The actual time of day for the leap second is 23:59:60, which can't be represented
             // using DateTime. So we'll use the time 00:00:00 of the next day.
             dtLeapSecond = dtLeapSecond.AddDays(1);
@@ -433,19 +455,17 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     /// <returns>The total value of leap seconds inserted thus far.</returns>
     public int TotalLeapSeconds()
     {
-        return TotalLeapSeconds(XDateTime.GetCurrentUtc());
+        return TotalLeapSeconds(XDateTime.NowUtc);
     }
 
     /// <summary>
     /// Find the difference between TAI and UTC at a given point in time.
     /// </summary>
-    /// <param name="dt">A point in time. Defaults to current
-    /// DateTime.</param>
+    /// <param name="dt">A point in time. Defaults to current DateTime.</param>
     /// <returns>The integer number of seconds difference.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">If year less than 1972.</exception>
     public byte CalcTAIMinusUTC(DateTime dt = new ())
     {
-        return (byte)(10 + TotalLeapSeconds(DateOnly.FromDateTime(dt)));
+        return (byte)(10 + TotalLeapSeconds(dt));
     }
 
     /// <summary>
@@ -467,7 +487,7 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
     /// <exception cref="ArgumentOutOfRangeException">If year less than 1972.</exception>
     public double CalcDUT1(DateTime dt = new ())
     {
-        return (TT_MINUS_TAI_MS / 1000.0) - CalcDeltaTNASA(dt) + CalcTAIMinusUTC(dt);
+        return TT_MINUS_TAI_MS / 1000.0 - CalcDeltaTNASA(dt) + CalcTAIMinusUTC(dt);
     }
 
     public void TestCalcDUT1()
@@ -485,49 +505,4 @@ public class TimeScaleService(LeapSecondRepository leapSecondRepository)
             }
         }
     }
-
-    /// <summary>
-    /// Copy of Table 10A in Astronomical Algorithms 2nd Ed. by Jean Meeus.
-    /// </summary>
-    private static readonly Dictionary<int, double> DeltaTData = new Dictionary<int, double>()
-    {
-        { 1620, 121.0 }, { 1622, 112.0 }, { 1624, 103.0 }, { 1626, 95.0 }, { 1628, 88.0 },
-        { 1630, 82.0 }, { 1632, 77.0 }, { 1634, 72.0 }, { 1636, 68.0 }, { 1638, 63.0 },
-        { 1640, 60.0 }, { 1642, 56.0 }, { 1644, 53.0 }, { 1646, 51.0 }, { 1648, 48.0 },
-        { 1650, 46.0 }, { 1652, 44.0 }, { 1654, 42.0 }, { 1656, 40.0 }, { 1658, 38.0 },
-        { 1660, 35.0 }, { 1662, 33.0 }, { 1664, 31.0 }, { 1666, 29.0 }, { 1668, 26.0 },
-        { 1670, 24.0 }, { 1672, 22.0 }, { 1674, 20.0 }, { 1676, 18.0 }, { 1678, 16.0 },
-        { 1680, 14.0 }, { 1682, 12.0 }, { 1684, 11.0 }, { 1686, 10.0 }, { 1688, 9.0 },
-        { 1690, 8.0 }, { 1692, 7.0 }, { 1694, 7.0 }, { 1696, 7.0 }, { 1698, 7.0 },
-        { 1700, 7.0 }, { 1702, 7.0 }, { 1704, 8.0 }, { 1706, 8.0 }, { 1708, 9.0 },
-        { 1710, 9.0 }, { 1712, 9.0 }, { 1714, 9.0 }, { 1716, 9.0 }, { 1718, 10.0 },
-        { 1720, 10.0 }, { 1722, 10.0 }, { 1724, 10.0 }, { 1726, 10.0 }, { 1728, 10.0 },
-        { 1730, 10.0 }, { 1732, 10.0 }, { 1734, 11.0 }, { 1736, 11.0 }, { 1738, 11.0 },
-        { 1740, 11.0 }, { 1742, 11.0 }, { 1744, 12.0 }, { 1746, 12.0 }, { 1748, 12.0 },
-        { 1750, 12.0 }, { 1752, 13.0 }, { 1754, 13.0 }, { 1756, 13.0 }, { 1758, 14.0 },
-        { 1760, 14.0 }, { 1762, 14.0 }, { 1764, 14.0 }, { 1766, 15.0 }, { 1768, 15.0 },
-        { 1770, 15.0 }, { 1772, 15.0 }, { 1774, 15.0 }, { 1776, 16.0 }, { 1778, 16.0 },
-        { 1780, 16.0 }, { 1782, 16.0 }, { 1784, 16.0 }, { 1786, 16.0 }, { 1788, 16.0 },
-        { 1790, 16.0 }, { 1792, 15.0 }, { 1794, 15.0 }, { 1796, 14.0 }, { 1798, 13.0 },
-        { 1800, 13.1 }, { 1802, 12.5 }, { 1804, 12.2 }, { 1806, 12.0 }, { 1808, 12.0 },
-        { 1810, 12.0 }, { 1812, 12.0 }, { 1814, 12.0 }, { 1816, 12.0 }, { 1818, 11.9 },
-        { 1820, 11.6 }, { 1822, 11.0 }, { 1824, 10.2 }, { 1826, 9.2 }, { 1828, 8.2 },
-        { 1830, 7.1 }, { 1832, 6.2 }, { 1834, 5.6 }, { 1836, 5.4 }, { 1838, 5.3 },
-        { 1840, 5.4 }, { 1842, 5.6 }, { 1844, 5.9 }, { 1846, 6.2 }, { 1848, 6.5 },
-        { 1850, 6.8 }, { 1852, 7.1 }, { 1854, 7.3 }, { 1856, 7.5 }, { 1858, 7.6 },
-        { 1860, 7.7 }, { 1862, 7.3 }, { 1864, 6.2 }, { 1866, 5.2 }, { 1868, 2.7 },
-        { 1870, 1.4 }, { 1872, -1.2 }, { 1874, -2.8 }, { 1876, -3.8 }, { 1878, -4.8 },
-        { 1880, -5.5 }, { 1882, -5.3 }, { 1884, -5.6 }, { 1886, -5.7 }, { 1888, -5.9 },
-        { 1890, -6.0 }, { 1892, -6.3 }, { 1894, -6.5 }, { 1896, -6.2 }, { 1898, -4.7 },
-        { 1900, -2.8 }, { 1902, -0.1 }, { 1904, 2.6 }, { 1906, 5.3 }, { 1908, 7.7 },
-        { 1910, 10.4 }, { 1912, 13.3 }, { 1914, 16.0 }, { 1916, 18.2 }, { 1918, 20.2 },
-        { 1920, 21.1 }, { 1922, 22.4 }, { 1924, 23.5 }, { 1926, 23.8 }, { 1928, 24.3 },
-        { 1930, 24.0 }, { 1932, 23.9 }, { 1934, 23.9 }, { 1936, 23.7 }, { 1938, 24.0 },
-        { 1940, 24.3 }, { 1942, 25.3 }, { 1944, 26.2 }, { 1946, 27.3 }, { 1948, 28.2 },
-        { 1950, 29.1 }, { 1952, 30.0 }, { 1954, 30.7 }, { 1956, 31.4 }, { 1958, 32.2 },
-        { 1960, 33.1 }, { 1962, 34.0 }, { 1964, 35.0 }, { 1966, 36.5 }, { 1968, 38.3 },
-        { 1970, 40.2 }, { 1972, 42.2 }, { 1974, 44.5 }, { 1976, 46.5 }, { 1978, 48.5 },
-        { 1980, 50.5 }, { 1982, 52.2 }, { 1984, 53.8 }, { 1986, 54.9 }, { 1988, 55.8 },
-        { 1990, 56.9 }, { 1992, 58.3 }, { 1994, 60.0 }, { 1996, 61.6 }, { 1998, 63.0 },
-    };
 }

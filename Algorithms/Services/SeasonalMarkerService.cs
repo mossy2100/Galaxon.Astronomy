@@ -1,9 +1,9 @@
+using Galaxon.Astronomy.Algorithms.Utilities;
 using Galaxon.Astronomy.Data.Enums;
-using Galaxon.Core.Time;
 using Galaxon.Numerics.Algebra;
 using Galaxon.Numerics.Geometry;
 
-namespace Galaxon.Astronomy.Algorithms;
+namespace Galaxon.Astronomy.Algorithms.Services;
 
 public class SeasonalMarkerService(SunService sunService)
 {
@@ -156,7 +156,7 @@ public class SeasonalMarkerService(SunService sunService)
     public static DateTime CalcSeasonalMarkerApprox(int year, ESeasonalMarker markerNumber)
     {
         double JDE0 = CalcSeasonalMarkerMean(year, markerNumber);
-        double T = JulianDateService.JulianCenturiesSinceJ2000(JDE0);
+        double T = JulianDateUtility.JulianCenturiesSinceJ2000(JDE0);
         double W = Angle.DegToRad(35999.373 * T - 2.47);
         double dLambda = 1 + 0.0334 * Cos(W) + 0.0007 * Cos(2 * W);
 
@@ -168,11 +168,10 @@ public class SeasonalMarkerService(SunService sunService)
         double JD_TT = JDE0 + 0.00001 * S / dLambda;
 
         // Get the date in Terrestrial Time (TT).
-        DateTime dt_TT = JulianDateService.JulianDate_to_DateTime(JD_TT);
+        DateTime dt_TT = JulianDateUtility.JulianDate_to_DateTime(JD_TT);
 
         // Calculate ∆T.
-        var deltaT_ticks =
-            (long)(TimeScaleService.CalcDeltaTNASA(dt_TT) / XTimeSpan.SECONDS_PER_TICK);
+        var deltaT_ticks = (long)(TimeScaleService.CalcDeltaTNASA(dt_TT) * TimeSpan.TicksPerSecond);
 
         // Subtract ∆T to get Universal Time.
         DateTime dt_UT = dt_TT.Subtract(new TimeSpan(deltaT_ticks));
@@ -196,7 +195,7 @@ public class SeasonalMarkerService(SunService sunService)
         const double delta = 1E-9;
         do
         {
-            (double Bs, double Ls) = sunService.CalcPosition(JD);
+            (double _, double Ls) = sunService.CalcPosition(JD);
             double diffLs = targetLs - Ls;
             done = Abs(diffLs) < delta;
             if (!done)
@@ -206,6 +205,6 @@ public class SeasonalMarkerService(SunService sunService)
             }
         } while (!done);
 
-        return JulianDateService.JulianDate_to_DateTime(JD);
+        return JulianDateUtility.JulianDate_to_DateTime(JD);
     }
 }

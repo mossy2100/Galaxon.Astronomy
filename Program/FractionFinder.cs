@@ -54,7 +54,7 @@ public class FractionFinder
             $"The rule: isLongMonth = (m % 2 == {oddMonthsLong}) || (m % {monthsPerCycle} % {gapLengthMonths} == {offset})");
 
         var longMonthCount = 0;
-        List<int> monthNumbers = new ();
+        List<int> monthNumbers = [];
         // LN = Lunation Number. LN = 0 started with the first New Moon of 2000, approximately 2000-01-06T18:14+0000.
         for (var month = 0; month < monthsPerCycle; month++)
         {
@@ -93,7 +93,7 @@ public class FractionFinder
     public static void FindLeapYearFraction()
     {
         double frac = XTimeSpan.DAYS_PER_TROPICAL_YEAR - (int)XTimeSpan.DAYS_PER_TROPICAL_YEAR;
-        List<double> fractions = new ();
+        List<double> fractions = [];
         for (var d = 1; d <= 10000; d++)
         {
             // Console.WriteLine($"Testing d = {d}...");
@@ -138,7 +138,7 @@ public class FractionFinder
         var gapLengthYears = 4;
         Console.WriteLine(
             $"The rule: isLeapYear = (m % {gapLengthYears} == 0) && (m % {yearsPerCycle} != 0)");
-        List<int> yearNumbers = new ();
+        List<int> yearNumbers = [];
         for (var y = 0; y < yearsPerCycle; y++)
         {
             if (IsLeapYear(y))
@@ -167,7 +167,7 @@ public class FractionFinder
         var b = 4;
         var c = 128;
         Console.WriteLine($"The rule: isLeapYear = (y % {a} % {b} == 0) && (y % {a} % {c} != 0)");
-        List<int> yearNumbers = new ();
+        List<int> yearNumbers = [];
         for (var y = 0; y < a; y++)
         {
             if (IsLeapYear(y % a))

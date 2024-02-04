@@ -1,4 +1,6 @@
-﻿namespace Galaxon.Astronomy.Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Galaxon.Astronomy.Data.Models;
 
 // Main class for astronomical objects.
 // All physical quantities are in SI units.
@@ -14,11 +16,13 @@ public class AstroObject
     // Core details
 
     // Primary key.
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     // Object name, e.g. "Sun", "Earth", "Ceres".
     // These are not assumed to be unique, and in some cases (minor planets) can be null.
-    [Column(TypeName = "varchar(50)")]
+    [MaxLength(20)]
     public string? Name { get; set; }
 
     // Object number, e.g. 2 (Venus), 301 (Luna), 1 (Ceres).
@@ -62,7 +66,7 @@ public class AstroObject
     public StellarRecord? Stellar { get; set; }
 
     // Link to Minor Planet Center record.
-    public MinorPlanetRecord? MinorPlanet { get; set; }
+    // public MinorPlanetRecord? MinorPlanet { get; set; }
 
     // Link to matching VSOP87D records.
     public List<VSOP87DRecord>? VSOP87DRecords { get; set; }
@@ -88,9 +92,12 @@ public class AstroObject
         // Match on name, number, both together, readable designation, or packed designation.
         return searchString == Name
             || searchString == Number.ToString()
+            || searchString == $"{Name} {Number}"
             || searchString == $"{Number} {Name}"
-            || searchString == (MinorPlanet?.ReadableDesignation ?? "")
-            || searchString == (MinorPlanet?.PackedDesignation ?? "");
+            || searchString == $"{Name} ({Number})"
+            || searchString == $"({Number}) {Name}";
+        // || searchString == (MinorPlanet?.ReadableDesignation ?? "")
+        // || searchString == (MinorPlanet?.PackedDesignation ?? "");
     }
 
     /// <summary>
@@ -133,12 +140,12 @@ public class AstroObject
     /// <returns>The object's name, number, or readable designation.</returns>
     public override string ToString()
     {
-        // Check for a readable designation (minor planets).
-        string? readable = MinorPlanet?.ReadableDesignation;
-        if (!string.IsNullOrEmpty(readable))
-        {
-            return readable;
-        }
+        // // Check for a readable designation (minor planets).
+        // string? readable = MinorPlanet?.ReadableDesignation;
+        // if (!string.IsNullOrEmpty(readable))
+        // {
+        //     return readable;
+        // }
 
         // Check for a name (planets, satellites, etc.).
         if (Name != null)
